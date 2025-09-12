@@ -1,0 +1,37 @@
+{
+  "name": "Counter Agent",
+  "version": "1.0.0",
+  "description": "现代React开发的计数器Agent",
+  "author": "Agent Developer",
+  "main": "dist/index.js",
+  "components": [
+    {
+      "name": "Counter",
+      "description": "可交互的计数器组件",
+      "props": {
+        "initialValue": {
+          "type": "number",
+          "default": 0,
+          "description": "初始计数值"
+        }
+      },
+      "events": [
+        {
+          "name": "onCountChange",
+          "description": "计数值改变时触发",
+          "params": {
+            "count": "number"
+          }
+        }
+      ]
+    }
+  ],
+  "requirements": {
+    "react": ">=18.0.0",
+    "flutter_widgets": ["Column", "Row", "Text", "ElevatedButton", "SizedBox", "Container"]
+  },
+  "permissions": [
+    "user_interaction",
+    "local_storage"
+  ]
+}

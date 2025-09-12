@@ -1,0 +1,38 @@
+{
+  "name": "counter-agent",
+  "version": "1.0.0",
+  "description": "A React-based Counter Agent for Flutter-React platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack --mode development --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": ["react", "agent", "flutter", "counter"],
+  "author": "Agent Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-react": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "babel-loader": "^9.1.0",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.3.3",
+    "ts-loader": "^9.5.1",
+    "@types/react": "^18.2.61"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  },
+  "dependencies": {
+    "@react-flutter/components": "workspace:^0.1.0"
+  },
+  "agentConfig": {
+    "targetPlatform": "flutter-react",
+    "apiVersion": "1.0",
+    "components": ["Counter"],
+    "permissions": ["user_interaction", "local_storage"]
+  }
+}
