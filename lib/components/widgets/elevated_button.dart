@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../base/flutter_component.dart';
 import '../../core/virtual_dom_parser.dart';
 import '../../core/component_registry.dart';
+import '../../utils/style_parsers/index.dart';
+import '../../utils/type_converters.dart';
 
 /// ElevatedButton组件映射
 class ElevatedButtonComponent extends FlutterComponent {
@@ -14,41 +16,76 @@ class ElevatedButtonComponent extends FlutterComponent {
   
   @override
   Map<String, Type> get supportedProps => {
-    'onPressed': String,
-    'disabled': bool,
+    'style': Map,                   // 统一style属性，包含所有视觉样式
+    'onPressed': String,            // 点击事件 - 独立属性
+    'onLongPress': String,          // 长按事件 - 独立属性
+    'onHover': String,              // 悬停事件 - 独立属性
+    'onFocusChange': String,        // 焦点事件 - 独立属性
+    'autofocus': bool,              // 自动焦点 - 独立属性
+    'clipBehavior': String,         // 裁剪行为 - 独立属性
+    'id': String,                   // 标识属性
   };
   
   @override
-  List<String> get supportedEvents => ['onPressed'];
+  List<String> get supportedEvents => ['onPressed', 'onLongPress', 'onHover', 'onFocusChange'];
   
   @override
   bool get supportsChildren => true;
   
   @override
   Widget build(VirtualDOM vdom) {
-    // 1. 解析按钮自身的属性
-    final onPressedEvent = vdom.getProp<String>('onPressed');
-    final disabled = vdom.getPropOrDefault<bool>('disabled', false);
+    // 解析style属性（视觉样式）
+    final styleMap = vdom.props['style'] as Map<String, dynamic>?;
+    final buttonStyle = ButtonParsers.parseElevatedButtonStyle(styleMap);
     
-    // 处理点击事件
+    // 解析独立属性（行为、事件）
+    final onPressedEvent = vdom.getProp<String>('onPressed');
+    final onLongPressEvent = vdom.getProp<String>('onLongPress');
+    final onHoverEvent = vdom.getProp<String>('onHover');
+    final onFocusChangeEvent = vdom.getProp<String>('onFocusChange');
+    final autofocus = vdom.getPropOrDefault<bool>('autofocus', false);
+    final clipBehavior = GeometryParsers.parseClipBehavior(vdom.getProp<String>('clipBehavior'));
+    final id = vdom.getProp<String>('id');
+    
+    // 处理事件回调
     VoidCallback? onPressed;
-    if (!disabled && onPressedEvent != null) {
+    if (onPressedEvent != null) {
       onPressed = () => ComponentRegistry.instance.triggerEvent(onPressedEvent);
     }
     
-    // 2. 统一、递归地构建所有子元素
+    VoidCallback? onLongPress;
+    if (onLongPressEvent != null) {
+      onLongPress = () => ComponentRegistry.instance.triggerEvent(onLongPressEvent);
+    }
+    
+    ValueChanged<bool>? onHover;
+    if (onHoverEvent != null) {
+      onHover = (hovering) => ComponentRegistry.instance.triggerEvent(onHoverEvent);
+    }
+    
+    ValueChanged<bool>? onFocusChange;
+    if (onFocusChangeEvent != null) {
+      onFocusChange = (focused) => ComponentRegistry.instance.triggerEvent(onFocusChangeEvent);
+    }
+    
+    // 构建子元素
     final List<Widget> childrenWidgets = vdom.getChildrenList()
         .map((childVdom) => ComponentRegistry.instance.buildComponent(childVdom))
         .where((widget) => widget != null)
         .cast<Widget>()
         .toList();
     
-    // 3. 将构建好的子元素作为 child 传递给按钮
-    // 注意：如果子元素多于一个，它们应该已经被一个布局组件（如Row/Column）包裹
     final Widget? child = childrenWidgets.isNotEmpty ? childrenWidgets.first : null;
     
     return ElevatedButton(
+      key: id != null ? Key(id) : null,
       onPressed: onPressed,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      style: buttonStyle,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior ?? Clip.none,
       child: child,
     );
   }

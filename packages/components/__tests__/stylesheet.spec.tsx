@@ -9,7 +9,7 @@
  * 4. 测试边界情况和错误处理
  */
 
-import * as React from 'react';
+import React from 'react';
 import styleSheet from '../src/styles/stylesheet';
 
 describe('StyleSheet', () => {
@@ -230,7 +230,7 @@ describe('StyleSheet', () => {
      * 重要性：确保类型安全和错误提示
      */
     test('应该拒绝继承非样式化组件', () => {
-      const RegularComponent = () => React.createElement('div');
+      const RegularComponent = () => <div />;
       
       expect(() => {
         styleSheet(RegularComponent as any)({ color: 'red' });

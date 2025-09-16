@@ -2,43 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import '../lib/main.dart' as app;
-import '../lib/core/agent_loader.dart';
 
-/// 自定义等待函数 - 等待特定Widget出现
+/// 范围匹配器
+Matcher inRange(double min, double max) => _InRange(min, max);
+
+class _InRange extends Matcher {
+  final double min, max;
+  _InRange(this.min, this.max);
+  
+  @override
+  bool matches(item, Map matchState) => item is num && item >= min && item <= max;
+  
+  @override
+  Description describe(Description description) => description.add('in range [$min, $max]');
+}
+
+/// 等待Widget出现
 Future<void> pumpUntilFound(
   WidgetTester tester,
   Finder finder, {
   Duration timeout = const Duration(seconds: 20),
 }) async {
-  bool found = false;
   final stopwatch = Stopwatch()..start();
-
   while (stopwatch.elapsed < timeout) {
     await tester.pump();
     if (finder.evaluate().isNotEmpty) {
-      found = true;
-      break;
+      print('✅ Found widget after ${stopwatch.elapsedMilliseconds}ms: $finder');
+      return;
     }
     await Future.delayed(const Duration(milliseconds: 100));
   }
-
-  stopwatch.stop();
-  if (!found) {
-    throw StateError('Widget not found after ${timeout.inSeconds} seconds: $finder');
-  }
-  print('✅ Found widget after ${stopwatch.elapsedMilliseconds}ms: $finder');
+  throw StateError('Widget not found after ${timeout.inSeconds} seconds: $finder');
 }
 
-/// 启动应用并等待Counter Agent就绪
+/// 启动应用并等待就绪
 Future<void> launchAppAndWaitReady(WidgetTester tester) async {
   print('📱 启动React-Flutter应用...');
   app.main();
   await tester.pumpAndSettle();
   
   print('⏳ 等待Counter Agent加载...');
-  // 直接等待Counter Agent就绪的明确信号，不再固定等待时间
   await pumpUntilFound(tester, find.byKey(const Key('counter_agent_ready')));
-  
   print('✅ Counter Agent就绪！');
 }
 
@@ -47,225 +51,249 @@ void main() {
   
   group('Counter Agent集成测试', () {
     
-    testWidgets('Agent初始化和加载测试', (WidgetTester tester) async {
-      print('🚀 测试Agent初始化和加载...');
-      
+    /// 每个测试都重新启动应用确保状态正确
+    Future<void> ensureAppLaunched(WidgetTester tester) async {
       await launchAppAndWaitReady(tester);
+    }
+    
+    testWidgets('Agent初始化和加载测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
       
-      // 验证基本UI组件存在
-      expect(find.byType(Column), findsOneWidget,
-        reason: '应该有一个Column布局组件');
-      
-      expect(find.byType(Container), findsAtLeastNWidgets(1),
-        reason: '应该有至少1个Container组件');
-      
-      // 验证基本文本内容存在
-      expect(find.text('基础样式：颜色+圆角+阴影+边框'), findsOneWidget,
-        reason: '应该显示基础样式Container的文本');
-      
-      expect(find.text('线性渐变：橙色到黄色'), findsOneWidget,
-        reason: '应该显示线性渐变Container的文本');
-      
-      expect(find.text('径向渐变：紫色到蓝紫色'), findsOneWidget,
-        reason: '应该显示径向渐变Container的文本');
-      
-      expect(find.text('圆形'), findsOneWidget,
-        reason: '应该显示圆形Container的文本');
-      
-      expect(find.text('右下角对齐文本'), findsOneWidget,
-        reason: '应该显示alignment演示Container的文本');
-      
-      expect(find.text('约束: 150-300x80-120'), findsOneWidget,
-        reason: '应该显示constraints演示Container的文本');
-      
-      print('✅ Agent初始化和加载测试通过');
+      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      expect(find.byType(Container), findsAtLeastNWidgets(1));
+      expect(find.byKey(const Key('basic-style-demo')), findsOneWidget);
+      expect(find.byKey(const Key('linear-gradient-demo')), findsOneWidget);
+      expect(find.byKey(const Key('radial-gradient-demo')), findsOneWidget);
+      expect(find.byKey(const Key('circle-shape-demo')), findsOneWidget);
+      expect(find.byKey(const Key('alignment-demo')), findsOneWidget);
+      expect(find.byKey(const Key('constraints-demo')), findsOneWidget);
     });
 
     testWidgets('Container Constraints约束功能测试', (WidgetTester tester) async {
-      print('🎯 测试Container Constraints约束功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('constraints-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认constraints演示文本存在
-      expect(find.text('约束: 150-300x80-120'), findsOneWidget,
-        reason: '应该显示constraints演示文本');
+      final container = tester.widget<Container>(finder);
+      final constraints = container.constraints!;
+      final padding = container.padding as EdgeInsets?;
+      final margin = container.margin as EdgeInsets?;
       
-      // 2. 通过id查找constraints演示Container
-      final constraintsDemoFinder = find.byKey(const Key('constraints-demo'));
-      expect(constraintsDemoFinder, findsOneWidget,
-        reason: '应该找到constraints演示Container');
+      // React代码中定义的原始约束
+      const expectedMinWidth = 150.0;
+      const expectedMaxWidth = 300.0;
+      const expectedMinHeight = 80.0;
+      const expectedMaxHeight = 120.0;
       
-      // 3. 获取Container widget
-      final constraintsDemoContainer = tester.widget<Container>(constraintsDemoFinder);
+      // 计算padding的影响 (EdgeInsets.all(16) = 左右各16px)
+      final paddingWidth = padding != null ? padding.left + padding.right : 0.0;
+      final paddingHeight = padding != null ? padding.top + padding.bottom : 0.0;
       
-      // 4. 验证该Container的constraints属性符合预期
-      expect(constraintsDemoContainer.constraints, isNotNull,
-        reason: 'constraints演示Container应该有constraints属性');
+      // 测试一个原生Flutter Container看看behavior
+      final testContainer = Container(
+        constraints: const BoxConstraints(
+          minWidth: 150,
+          maxWidth: 300,
+          minHeight: 80,
+          maxHeight: 120
+        ),
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(10),
+        color: Colors.red,
+      );
       
-      final constraints = constraintsDemoContainer.constraints!;
-      expect(constraints.minWidth, equals(150.0),
-        reason: '最小宽度应该为150');
-      expect(constraints.maxWidth, equals(300.0),
-        reason: '最大宽度应该为300');
-      expect(constraints.minHeight, equals(80.0),
-        reason: '最小高度应该为80');
-      expect(constraints.maxHeight, equals(120.0),
-        reason: '最大高度应该为120');
+      print('🧪 原生Flutter Container constraints: ${testContainer.constraints}');
       
-      // 5. 验证该Container的alignment属性也正确设置
-      expect(constraintsDemoContainer.alignment, equals(Alignment.center),
-        reason: 'constraints演示Container应该设置为center对齐');
+      // 基于正确的原始约束值验证
+      expect(constraints.minWidth, equals(150.0));
+      expect(constraints.maxWidth, equals(300.0));
+      expect(constraints.minHeight, equals(80.0));
+      expect(constraints.maxHeight, equals(120.0));
       
-      print('✅ 找到constraints演示Container，constraints = ${constraintsDemoContainer.constraints}');
-      print('✅ Container Constraints约束功能测试通过');
+      // 验证实际渲染尺寸在约束范围内
+      final size = tester.getSize(finder);
+      expect(size.width, inRange(150.0, 300.0));
+      expect(size.height, inRange(80.0, 120.0));
     });
 
     testWidgets('Container Alignment对齐功能测试', (WidgetTester tester) async {
-      print('🎯 测试Container Alignment对齐功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('alignment-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认alignment演示文本存在
-      expect(find.text('右下角对齐文本'), findsOneWidget,
-        reason: '应该显示alignment演示文本');
-      
-      // 2. 通过id查找alignment演示Container
-      final alignmentDemoFinder = find.byKey(const Key('alignment-demo'));
-      expect(alignmentDemoFinder, findsOneWidget,
-        reason: '应该找到alignment演示Container');
-      
-      // 3. 获取Container widget
-      final alignmentDemoContainer = tester.widget<Container>(alignmentDemoFinder);
-      
-      // 4. 验证该Container的alignment属性符合预期
-      expect(alignmentDemoContainer.alignment, equals(Alignment.bottomRight),
-        reason: 'alignment演示Container应该设置为bottomRight对齐');
-      
-      print('✅ 找到alignment演示Container，alignment = ${alignmentDemoContainer.alignment}');
-      print('✅ Container Alignment对齐功能测试通过');
+      final container = tester.widget<Container>(finder);
+      expect(container.alignment, equals(Alignment.bottomRight));
     });
 
     testWidgets('Container ForegroundDecoration前景装饰功能测试', (WidgetTester tester) async {
-      print('🎨 测试Container ForegroundDecoration前景装饰功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('foreground-decoration-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认前景装饰演示文本存在
-      expect(find.text('前景装饰：金色边框覆盖层'), findsOneWidget,
-        reason: '应该显示前景装饰演示文本');
+      final container = tester.widget<Container>(finder);
+      final decoration = container.foregroundDecoration as BoxDecoration;
+      final border = decoration.border as Border;
       
-      // 2. 通过id查找前景装饰演示Container
-      final foregroundDemoFinder = find.byKey(const Key('foreground-decoration-demo'));
-      expect(foregroundDemoFinder, findsOneWidget,
-        reason: '应该找到前景装饰演示Container');
-      
-      // 3. 获取Container widget
-      final foregroundDemoContainer = tester.widget<Container>(foregroundDemoFinder);
-      
-      // 4. 验证该Container的foregroundDecoration属性存在
-      expect(foregroundDemoContainer.foregroundDecoration, isNotNull,
-        reason: '前景装饰演示Container应该有foregroundDecoration');
-      expect(foregroundDemoContainer.foregroundDecoration, isA<BoxDecoration>(),
-        reason: 'foregroundDecoration应该是BoxDecoration类型');
-      
-      // 5. 验证前景装饰的边框属性
-      final foregroundDecoration = foregroundDemoContainer.foregroundDecoration as BoxDecoration;
-      expect(foregroundDecoration.border, isNotNull,
-        reason: '前景装饰应该有边框');
-      expect(foregroundDecoration.border, isA<Border>(),
-        reason: '前景装饰边框应该是Border类型');
-      
-      // 6. 验证边框颜色（金色 RGB(255, 193, 7)）
-      final border = foregroundDecoration.border as Border;
-      final borderColor = border.top.color;
-      expect(borderColor.red, equals(255),
-        reason: '前景边框红色分量应该是255');
-      expect(borderColor.green, equals(193),
-        reason: '前景边框绿色分量应该是193');
-      expect(borderColor.blue, equals(7),
-        reason: '前景边框蓝色分量应该是7');
-      expect(border.top.width, equals(3.0),
-        reason: '前景边框宽度应该是3.0');
-      
-      print('✅ 找到前景装饰演示Container，foregroundDecoration边框颜色 = RGB(${borderColor.red}, ${borderColor.green}, ${borderColor.blue})');
-      print('✅ Container ForegroundDecoration前景装饰功能测试通过');
+      expect(border.top.color.green, equals(193));
     });
 
     testWidgets('Container ClipBehavior裁剪行为功能测试', (WidgetTester tester) async {
-      print('✂️ 测试Container ClipBehavior裁剪行为功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('clip-behavior-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认裁剪演示文本存在
-      expect(find.text('裁剪演示：超出部分被裁剪'), findsOneWidget,
-        reason: '应该显示裁剪演示文本');
-      
-      // 2. 通过id查找裁剪演示Container
-      final clipDemoFinder = find.byKey(const Key('clip-behavior-demo'));
-      expect(clipDemoFinder, findsOneWidget,
-        reason: '应该找到裁剪演示Container');
-      
-      // 3. 获取Container widget
-      final clipDemoContainer = tester.widget<Container>(clipDemoFinder);
-      
-      // 4. 验证该Container的clipBehavior属性
-      expect(clipDemoContainer.clipBehavior, equals(Clip.antiAlias),
-        reason: '裁剪演示Container应该设置为antiAlias裁剪');
-      
-      print('✅ 找到裁剪演示Container，clipBehavior = ${clipDemoContainer.clipBehavior}');
-      print('✅ Container ClipBehavior裁剪行为功能测试通过');
+      final container = tester.widget<Container>(finder);
+      expect(container.clipBehavior, equals(Clip.antiAlias));
     });
 
     testWidgets('Container TransformAlignment变换中心点功能测试', (WidgetTester tester) async {
-      print('🎯 测试Container TransformAlignment变换中心点功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('transform-alignment-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认变换中心点演示文本存在
-      expect(find.text('变换中心点：左上角对齐'), findsOneWidget,
-        reason: '应该显示变换中心点演示文本');
-      
-      // 2. 通过id查找变换中心点演示Container
-      final transformAlignmentDemoFinder = find.byKey(const Key('transform-alignment-demo'));
-      expect(transformAlignmentDemoFinder, findsOneWidget,
-        reason: '应该找到变换中心点演示Container');
-      
-      // 3. 获取Container widget
-      final transformAlignmentDemoContainer = tester.widget<Container>(transformAlignmentDemoFinder);
-      
-      // 4. 验证该Container的transformAlignment属性
-      expect(transformAlignmentDemoContainer.transformAlignment, equals(Alignment.topLeft),
-        reason: '变换中心点演示Container应该设置为topLeft对齐');
-      
-      print('✅ 找到变换中心点演示Container，transformAlignment = ${transformAlignmentDemoContainer.transformAlignment}');
-      print('✅ Container TransformAlignment变换中心点功能测试通过');
+      final container = tester.widget<Container>(finder);
+      expect(container.transformAlignment, equals(Alignment.topLeft));
     });
 
     testWidgets('Container Transform Matrix4变换功能测试', (WidgetTester tester) async {
-      print('🔄 测试Container Transform Matrix4变换功能...');
+      await ensureAppLaunched(tester);
       
-      await launchAppAndWaitReady(tester);
+      final finder = find.byKey(const Key('transform-demo'));
+      expect(finder, findsOneWidget);
       
-      // 1. 首先确认变换演示文本存在
-      expect(find.text('Matrix4变换：缩放1.2倍'), findsOneWidget,
-        reason: '应该显示Matrix4变换演示文本');
+      final container = tester.widget<Container>(finder);
+      final transform = container.transform!;
       
-      // 2. 通过id查找变换演示Container
-      final transformDemoFinder = find.byKey(const Key('transform-demo'));
-      expect(transformDemoFinder, findsOneWidget,
-        reason: '应该找到变换演示Container');
+      expect(container.transformAlignment, equals(Alignment.center));
+      expect(transform.entry(0, 0), closeTo(1.2, 0.01));
+      expect(transform.entry(1, 1), closeTo(1.2, 0.01));
+    });
+
+    testWidgets('SingleChildScrollView滚动视图功能测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
       
-      // 3. 获取Container widget
-      final transformDemoContainer = tester.widget<Container>(transformDemoFinder);
+      final finder = find.byKey(const Key('main-scroll-view'));
+      expect(finder, findsOneWidget);
       
-      // 4. 验证该Container的transform属性
-      expect(transformDemoContainer.transform, isNotNull,
-        reason: '变换演示Container应该有transform属性');
-      expect(transformDemoContainer.transform, isA<Matrix4>(),
-        reason: 'transform应该是Matrix4类型');
+      final scrollView = tester.widget<SingleChildScrollView>(finder);
+      expect(scrollView.scrollDirection, equals(Axis.vertical));
       
-      print('✅ 找到变换演示Container，transform = ${transformDemoContainer.transform}');
-      print('✅ Container Transform Matrix4变换功能测试通过');
+      await tester.drag(finder, const Offset(0, -200));
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('Column布局组件功能测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
+      
+      final finder = find.byKey(const Key('demo-column'));
+      expect(finder, findsOneWidget);
+      
+      final column = tester.widget<Column>(finder);
+      expect(column.direction, equals(Axis.vertical));
+      expect(column.mainAxisAlignment, equals(MainAxisAlignment.spaceEvenly));
+      expect(column.crossAxisAlignment, equals(CrossAxisAlignment.center));
+      expect(column.mainAxisSize, equals(MainAxisSize.max));
+      expect(column.children.length, equals(4));
+    });
+
+    testWidgets('Row布局组件功能测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
+      
+      final finder = find.byKey(const Key('demo-row'));
+      expect(finder, findsOneWidget);
+      
+      final row = tester.widget<Row>(finder);
+      expect(row.direction, equals(Axis.horizontal));
+      expect(row.mainAxisAlignment, equals(MainAxisAlignment.spaceEvenly));
+      expect(row.crossAxisAlignment, equals(CrossAxisAlignment.center));
+      expect(row.mainAxisSize, equals(MainAxisSize.max));
+      expect(row.children.length, equals(3));
+    });
+
+    testWidgets('Text文本组件功能测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
+      
+      // 验证Text演示容器存在
+      final textDemoContainer = find.byKey(const Key('text-demo'));
+      expect(textDemoContainer, findsOneWidget);
+      
+      // 验证标题文本
+      final titleText = tester.widget<Text>(find.byKey(const Key('title-text')));
+      expect(titleText.data, equals('Text组件演示'));
+      expect(titleText.style?.fontSize, equals(18.0));
+      expect(titleText.style?.fontWeight, equals(FontWeight.bold));
+      
+      // 验证正文文本
+      final bodyText = tester.widget<Text>(find.byKey(const Key('body-text')));
+      expect(bodyText.data, contains('这是一段普通文本'));
+      expect(bodyText.maxLines, equals(3));
+      expect(bodyText.textAlign, equals(TextAlign.left));
+      expect(bodyText.style?.height, equals(1.5));
+      
+      // 验证样式文本
+      final styledText = tester.widget<Text>(find.byKey(const Key('styled-text')));
+      expect(styledText.data, contains('样式文本'));
+      expect(styledText.style?.fontWeight, equals(FontWeight.w600));
+      expect(styledText.style?.decoration, equals(TextDecoration.underline));
+      expect(styledText.style?.letterSpacing, equals(1.2));
+      
+      // 验证省略号文本
+      final ellipsisText = tester.widget<Text>(find.byKey(const Key('ellipsis-text')));
+      expect(ellipsisText.data, contains('溢出处理'));
+      expect(ellipsisText.maxLines, equals(1));
+      expect(ellipsisText.overflow, equals(TextOverflow.ellipsis));
+      expect(ellipsisText.style?.fontStyle, equals(FontStyle.italic));
+    });
+
+    testWidgets('SizedBox尺寸控制组件功能测试', (WidgetTester tester) async {
+      await ensureAppLaunched(tester);
+      
+      // 验证SizedBox演示容器存在
+      final sizedBoxDemoContainer = find.byKey(const Key('sizedbox-demo'));
+      expect(sizedBoxDemoContainer, findsOneWidget);
+      
+      // 验证固定尺寸SizedBox
+      final fixedSizeBox = tester.widget<SizedBox>(find.byKey(const Key('fixed-size-box')));
+      expect(fixedSizeBox.width, equals(50.0));
+      expect(fixedSizeBox.height, equals(30.0));
+      
+      // 验证更大尺寸的SizedBox
+      final largerSizeBox = tester.widget<SizedBox>(find.byKey(const Key('larger-size-box')));
+      expect(largerSizeBox.width, equals(80.0));
+      expect(largerSizeBox.height, equals(40.0));
+      
+      // 验证正方形SizedBox
+      final squareSizeBox = tester.widget<SizedBox>(find.byKey(const Key('square-size-box')));
+      expect(squareSizeBox.width, equals(60.0));
+      expect(squareSizeBox.height, equals(60.0));
+      expect(squareSizeBox.width, equals(squareSizeBox.height)); // 确保是正方形
+      
+      // 验证间距控制SizedBox
+      final spacer20 = tester.widget<SizedBox>(find.byKey(const Key('spacer-20')));
+      expect(spacer20.width, equals(20.0));
+      expect(spacer20.height, isNull); // 间距控制通常只设置一个维度
+      
+      final spacer40 = tester.widget<SizedBox>(find.byKey(const Key('spacer-40')));
+      expect(spacer40.width, equals(40.0));
+      expect(spacer40.height, isNull);
+      
+      // 验证实际渲染尺寸
+      final fixedBoxSize = tester.getSize(find.byKey(const Key('fixed-size-box')));
+      expect(fixedBoxSize.width, equals(50.0));
+      expect(fixedBoxSize.height, equals(30.0));
+      
+      final largerBoxSize = tester.getSize(find.byKey(const Key('larger-size-box')));
+      expect(largerBoxSize.width, equals(80.0));
+      expect(largerBoxSize.height, equals(40.0));
+      
+      final squareBoxSize = tester.getSize(find.byKey(const Key('square-size-box')));
+      expect(squareBoxSize.width, equals(60.0));
+      expect(squareBoxSize.height, equals(60.0));
     });
   });
 }

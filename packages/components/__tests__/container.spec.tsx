@@ -9,7 +9,7 @@
  * 4. 测试边界情况处理
  */
 
-import * as React from 'react';
+import React from 'react';
 import { Container } from '../src/container';
 import { ContainerStyle, ClipBehaviorValue, AlignmentValue } from '../src/styles/types';
 import { Text } from '../src/text';
@@ -27,14 +27,11 @@ describe('Container Component', () => {
      * 重要性：确保符合CONTAINER_DESIGN.md规范
      */
     test('应该接受children和style属性', () => {
-      const containerProps = {
-        children: React.createElement(Text, { text: 'Test Content' }),
-        style: { padding: 16, color: Color.blue }
-      };
-      
       // 类型检查：这些应该通过TypeScript编译
       expect(() => {
-        React.createElement(Container, containerProps);
+        <Container style={{ padding: 16, color: Color.blue }}>
+          <Text text="Test Content" />
+        </Container>
       }).not.toThrow();
     });
 
@@ -44,38 +41,21 @@ describe('Container Component', () => {
      * 重要性：确保类型安全
      */
     test('应该接受ContainerStyle类型的style', () => {
-      const validStyle: ContainerStyle = {
-        width: 100,
-        height: 200,
-        padding: 16,
-        margin: 8,
-        color: Color.blue,
-        decoration: {
-          borderRadius: 8,
-          border: { width: 1, color: Color.grey }
-        }
-      };
-      
       expect(() => {
-        React.createElement(Container, { style: validStyle });
+        <Container style={{
+          width: 100,
+          height: 200,
+          padding: 16,
+          margin: 8,
+          color: Color.blue,
+          decoration: {
+            borderRadius: 8,
+            border: { width: 1, color: Color.grey }
+          }
+        }} />;
       }).not.toThrow();
     });
 
-    /**
-     * 测试目的：验证style数组的支持
-     * 验证路径：ContainerStyle[] → 正确处理
-     * 重要性：支持样式合并功能
-     */
-    test('应该接受ContainerStyle数组', () => {
-      const styleArray: ContainerStyle[] = [
-        { padding: 16, color: Color.blue },
-        { margin: 8, color: Color.red }
-      ];
-      
-      expect(() => {
-        React.createElement(Container, { style: styleArray });
-      }).not.toThrow();
-    });
   });
 
   describe('样式合并功能', () => {
@@ -85,29 +65,11 @@ describe('Container Component', () => {
      * 重要性：确保基础功能正确
      */
     test('应该正确处理单个样式对象', () => {
-      const style = { padding: 16, color: Color.blue };
-      
-      // 我们不能直接测试React.createElement的结果，但可以测试组件不会抛出错误
       expect(() => {
-        React.createElement(Container, { style });
+        <Container style={{ padding: 16, color: Color.blue }} />;
       }).not.toThrow();
     });
 
-    /**
-     * 测试目的：验证样式数组的合并
-     * 验证路径：style数组 → mergeMultipleStyles → 合并结果
-     * 重要性：确保样式继承功能正确
-     */
-    test('应该正确合并样式数组', () => {
-      const styleArray = [
-        { padding: 16, color: Color.blue },
-        { color: Color.red, margin: 8 }
-      ];
-      
-      expect(() => {
-        React.createElement(Container, { style: styleArray });
-      }).not.toThrow();
-    });
 
     /**
      * 测试目的：验证空style的处理
@@ -116,22 +78,12 @@ describe('Container Component', () => {
      */
     test('应该正确处理空样式', () => {
       expect(() => {
-        React.createElement(Container);
-        React.createElement(Container, { style: undefined });
-        React.createElement(Container, { style: null as any });
+        <Container />;
+        <Container style={undefined} />;
+        <Container style={null as any} />;
       }).not.toThrow();
     });
 
-    /**
-     * 测试目的：验证空数组的处理
-     * 验证路径：[] → 正确处理
-     * 重要性：确保边界情况的健壮性
-     */
-    test('应该正确处理空样式数组', () => {
-      expect(() => {
-        React.createElement(Container, { style: [] });
-      }).not.toThrow();
-    });
   });
 
   describe('复杂样式对象', () => {
@@ -141,31 +93,29 @@ describe('Container Component', () => {
      * 重要性：确保复杂样式的支持
      */
     test('应该支持复杂的decoration样式', () => {
-      const complexStyle: ContainerStyle = {
-        decoration: {
-          borderRadius: 12,
-          border: { width: 2, color: Color.blue },
-          boxShadow: [
-            { color: Color.fromRGBO(0, 0, 0, 0.1), blurRadius: 4, offset: { dx: 0, dy: 2 }, blurStyle: 'normal' }
-          ],
-          gradient: {
-            type: 'linear',
-            begin: 'topLeft',
-            end: 'bottomRight',
-            colors: [Color.blue, Color.purple],
-            tileMode: 'clamp'
-          },
-          image: {
-            url: 'https://example.com/background.jpg',
-            fit: 'cover',
-            repeat: 'noRepeat'
-          },
-          shape: 'rectangle'
-        }
-      };
-      
       expect(() => {
-        React.createElement(Container, { style: complexStyle });
+        <Container style={{
+          decoration: {
+            borderRadius: 12,
+            border: { width: 2, color: Color.blue },
+            boxShadow: [
+              { color: Color.fromRGBO(0, 0, 0, 0.1), blurRadius: 4, offset: { dx: 0, dy: 2 }, blurStyle: 'normal' }
+            ],
+            gradient: {
+              type: 'linear',
+              begin: 'topLeft',
+              end: 'bottomRight',
+              colors: [Color.blue, Color.purple],
+              tileMode: 'clamp'
+            },
+            image: {
+              url: 'https://example.com/background.jpg',
+              fit: 'cover',
+              repeat: 'noRepeat'
+            },
+            shape: 'rectangle'
+          }
+        }} />;
       }).not.toThrow();
     });
 
@@ -175,17 +125,15 @@ describe('Container Component', () => {
      * 重要性：确保布局约束的支持
      */
     test('应该支持constraints样式', () => {
-      const constraintStyle: ContainerStyle = {
-        constraints: {
-          minWidth: 100,
-          maxWidth: 300,
-          minHeight: 50,
-          maxHeight: 200
-        }
-      };
-      
       expect(() => {
-        React.createElement(Container, { style: constraintStyle });
+        <Container style={{
+          constraints: {
+            minWidth: 100,
+            maxWidth: 300,
+            minHeight: 50,
+            maxHeight: 200
+          }
+        }} />;
       }).not.toThrow();
     });
 
@@ -217,8 +165,8 @@ describe('Container Component', () => {
       };
       
       expect(() => {
-        React.createElement(Container, { style: rectangleStyle });
-        React.createElement(Container, { style: circleStyle });
+        <Container style={rectangleStyle} />;
+        <Container style={circleStyle} />;
       }).not.toThrow();
     });
 
@@ -269,7 +217,7 @@ describe('Container Component', () => {
       };
       
       expect(() => {
-        React.createElement(Container, { style: fullDecorationStyle });
+        <Container style={fullDecorationStyle} />;
       }).not.toThrow();
       
       // 验证所有decoration属性都存在
@@ -303,9 +251,7 @@ describe('Container Component', () => {
 
       constraintsValues.forEach(constraints => {
         expect(() => {
-          React.createElement(Container, { 
-            style: { constraints } 
-          });
+          <Container style={{ constraints }} />;
         }).not.toThrow();
       });
     });
@@ -316,34 +262,16 @@ describe('Container Component', () => {
      * 重要性：确保样式系统的兼容性
      */
     test('应该支持constraints与其他样式的组合', () => {
-      const combinedStyle: ContainerStyle = {
-        constraints: { minWidth: 100, maxWidth: 300 },
-        color: Color.blue,
-        padding: EdgeInsets.all(10),
-        alignment: 'center'
-      };
-
       expect(() => {
-        React.createElement(Container, { style: combinedStyle });
+        <Container style={{
+          constraints: { minWidth: 100, maxWidth: 300 },
+          color: Color.blue,
+          padding: EdgeInsets.all(10),
+          alignment: 'center'
+        }} />;
       }).not.toThrow();
     });
 
-    /**
-     * 测试目的：验证constraints在样式数组中的处理
-     * 验证路径：样式数组包含constraints → 正确合并
-     * 重要性：确保样式合并逻辑的健壮性
-     */
-    test('应该正确处理样式数组中的constraints', () => {
-      const styles: ContainerStyle[] = [
-        { constraints: { minWidth: 50 } },
-        { constraints: { maxWidth: 200 } },
-        { color: Color.red }
-      ];
-
-      expect(() => {
-        React.createElement(Container, { style: styles });
-      }).not.toThrow();
-    });
 
     /**
      * 测试目的：验证constraints为undefined的处理
@@ -352,9 +280,7 @@ describe('Container Component', () => {
      */
     test('应该正确处理undefined constraints', () => {
       expect(() => {
-        React.createElement(Container, { 
-          style: { constraints: undefined, color: Color.green } 
-        });
+        <Container style={{ constraints: undefined, color: Color.green }} />;
       }).not.toThrow();
     });
   });
@@ -373,9 +299,8 @@ describe('Container Component', () => {
       ] as const;
       
       allAlignmentValues.forEach(alignment => {
-        const style: ContainerStyle = { alignment };
         expect(() => {
-          React.createElement(Container, { style });
+          <Container style={{ alignment }} />;
         }).not.toThrow();
       });
     });
@@ -400,34 +325,12 @@ describe('Container Component', () => {
       };
       
       expect(() => {
-        React.createElement(Container, { 
-          style: combinedStyle,
-          children: React.createElement('span', null, 'Test Content')
-        });
+        <Container style={combinedStyle}>
+          <span>Test Content</span>
+        </Container>;
       }).not.toThrow();
     });
 
-    /**
-     * 测试目的：验证alignment在样式数组中的处理
-     * 验证路径：样式合并 → alignment正确覆盖
-     * 重要性：确保样式合并时alignment的优先级正确
-     */
-    test('应该在样式数组中正确处理alignment', () => {
-      const baseStyle: ContainerStyle = {
-        padding: 16,
-        alignment: 'topLeft'
-      };
-      
-      const overrideStyle: ContainerStyle = {
-        alignment: 'bottomRight'
-      };
-      
-      expect(() => {
-        React.createElement(Container, { 
-          style: [baseStyle, overrideStyle]
-        });
-      }).not.toThrow();
-    });
 
     /**
      * 测试目的：验证undefined alignment值的处理
@@ -435,14 +338,12 @@ describe('Container Component', () => {
      * 重要性：确保可选属性的正确处理
      */
     test('应该正确处理undefined alignment', () => {
-      const style: ContainerStyle = {
-        width: 100,
-        height: 100,
-        alignment: undefined  // 显式设置为undefined
-      };
-      
       expect(() => {
-        React.createElement(Container, { style });
+        <Container style={{
+          width: 100,
+          height: 100,
+          alignment: undefined  // 显式设置为undefined
+        }} />;
       }).not.toThrow();
     });
   });
@@ -466,10 +367,10 @@ describe('Container Component', () => {
         alignment: 'center'
       };
       
-      const children = React.createElement(Text, { text: 'Card Content' });
-      
       expect(() => {
-        React.createElement(Container, { style: cardStyle }, children);
+        <Container style={cardStyle}>
+          <Text text="Card Content" />
+        </Container>;
       }).not.toThrow();
     });
 
@@ -489,11 +390,11 @@ describe('Container Component', () => {
         margin: 8
       };
       
-      // 模拟styleSheet(BaseComponent)(extendedStyle)的结果
-      const combinedStyles = [baseStyle, extendedStyle];
+      // 模拟styleSheet(BaseComponent)(extendedStyle)的结果，单个样式对象
+      const combinedStyle = { ...baseStyle, ...extendedStyle };
       
       expect(() => {
-        React.createElement(Container, { style: combinedStyles });
+        <Container style={combinedStyle} />;
       }).not.toThrow();
     });
   });

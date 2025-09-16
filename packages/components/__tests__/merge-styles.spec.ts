@@ -67,65 +67,6 @@ describe('mergeStyles', () => {
     });
   });
 
-  describe('数组样式处理', () => {
-    /**
-     * 测试目的：验证样式数组的处理
-     * 验证路径：baseStyles + [style1, style2] → 正确合并
-     * 重要性：支持多层样式覆盖
-     */
-    test('应该能够处理样式数组', () => {
-      const baseStyles = { padding: 16, color: 'blue', margin: 4 };
-      const propStyles = [
-        { color: 'red', fontSize: 20 },
-        { margin: 8, padding: 20 }
-      ];
-      const result = mergeStyles(baseStyles, propStyles);
-      
-      expect(result).toEqual({
-        padding: { top: 20, right: 20, bottom: 20, left: 20 },    // 最后的数组元素覆盖，转换为EdgeInsets
-        color: 'red',   // 第一个数组元素覆盖
-        margin: { top: 8, right: 8, bottom: 8, left: 8 },      // 最后的数组元素覆盖，转换为EdgeInsets
-        fontSize: 20    // 第一个数组元素添加
-      });
-    });
-
-    /**
-     * 测试目的：验证空数组的处理
-     * 验证路径：baseStyles + [] → baseStyles
-     * 重要性：确保空数组不会影响基础样式
-     */
-    test('应该能够处理空样式数组', () => {
-      const baseStyles = { padding: 16, color: 'blue' };
-      const result = mergeStyles(baseStyles, []);
-      
-      expect(result).toEqual({
-        padding: { top: 16, right: 16, bottom: 16, left: 16 },
-        color: 'blue'
-      });
-    });
-
-    /**
-     * 测试目的：验证包含null/undefined的数组处理
-     * 验证路径：baseStyles + [style1, null, style2] → 忽略null值
-     * 重要性：确保健壮性，忽略无效值
-     */
-    test('应该能够处理包含null/undefined的样式数组', () => {
-      const baseStyles = { padding: 16 };
-      const propStyles = [
-        { color: 'red' },
-        null,
-        undefined,
-        { margin: 8 }
-      ];
-      const result = mergeStyles(baseStyles, propStyles);
-      
-      expect(result).toEqual({
-        padding: { top: 16, right: 16, bottom: 16, left: 16 },
-        color: 'red',
-        margin: { top: 8, right: 8, bottom: 8, left: 8 }
-      });
-    });
-  });
 
   describe('复杂对象覆盖策略', () => {
     /**

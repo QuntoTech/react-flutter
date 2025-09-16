@@ -16,6 +16,7 @@ import { Border, BorderSide } from './border';
 function convertStyleForFlutter(style: any): any {
   if (!style || typeof style !== 'object') return style;
   
+  
   const converted: any = {};
   
   for (const [key, value] of Object.entries(style)) {
@@ -69,13 +70,14 @@ function convertStyleForFlutter(style: any): any {
     }
   }
   
+  
   return converted;
 }
 
 /**
  * 合并样式对象，采用覆盖策略
  * @param baseStyles 基础样式对象
- * @param propStyles 传入的样式（可以是对象或数组）
+ * @param propStyles 传入的样式对象
  * @returns 合并后的样式对象
  */
 export function mergeStyles(baseStyles: any, propStyles?: any): any {
@@ -83,9 +85,6 @@ export function mergeStyles(baseStyles: any, propStyles?: any): any {
   
   if (!propStyles) {
     merged = baseStyles;
-  } else if (Array.isArray(propStyles)) {
-    // 数组情况：从左到右依次覆盖
-    merged = propStyles.reduce((acc, style) => ({ ...acc, ...style }), baseStyles);
   } else {
     // 对象情况：propStyles直接覆盖baseStyles
     merged = { ...baseStyles, ...propStyles };

@@ -3,7 +3,7 @@ import '../base/flutter_component.dart';
 import '../../core/virtual_dom_parser.dart';
 import '../../core/component_registry.dart';
 import '../../utils/type_converters.dart';
-import '../../utils/style_parsers.dart';
+import '../../utils/style_parsers/index.dart';
 
 // 开发模式调试输出控制
 const bool _kDebugMode = false;
@@ -18,21 +18,8 @@ class ContainerComponent extends FlutterComponent {
   
   @override
   Map<String, Type> get supportedProps => {
-    'style': Map,  // 新的统一style属性
-    // 保留旧属性以向后兼容
-    'padding': dynamic,
-    'margin': dynamic,
-    'width': double,
-    'height': double,
-    'color': String,
-    'decoration': Map,
-    'foregroundDecoration': Map,  // 新增foregroundDecoration属性
-    'alignment': String,  // 新增alignment属性
-    'constraints': Map,   // 新增constraints属性
-    'clipBehavior': String,       // 新增clipBehavior属性
-    'transformAlignment': String, // 新增transformAlignment属性
-    'transform': List,            // 新增transform属性
-    'id': String,         // 通用id属性，用于测试和查找
+    'style': Map,  // 统一style属性，包含所有样式配置
+    'id': String,  // 通用id属性，用于测试和查找
   };
   
   @override
@@ -40,43 +27,22 @@ class ContainerComponent extends FlutterComponent {
   
   @override
   Widget build(VirtualDOM vdom) {
-    // 首先尝试从style属性中解析，如果没有则回退到旧的独立属性
+    // 只从style属性中解析所有样式
     final styleMap = vdom.props['style'] as Map<String, dynamic>?;
     
-    // 解析样式属性（优先从style中获取，否则从独立属性获取）
-    final width = _getStyleProperty<double>(styleMap, vdom, 'width');
-    final height = _getStyleProperty<double>(styleMap, vdom, 'height');
+    // 解析样式属性
+    final width = styleMap?['width'] != null ? (styleMap!['width'] as num).toDouble() : null;
+    final height = styleMap?['height'] != null ? (styleMap!['height'] as num).toDouble() : null;
     
-    final padding = StyleParsers.parseEdgeInsets(
-      _getStyleProperty(styleMap, vdom, 'padding')
-    );
-    final margin = StyleParsers.parseEdgeInsets(
-      _getStyleProperty(styleMap, vdom, 'margin')
-    );
+    final padding = PrimitiveParsers.parseEdgeInsets(styleMap?['padding']);
+    final margin = PrimitiveParsers.parseEdgeInsets(styleMap?['margin']);
+    final color = PrimitiveParsers.parseColor(styleMap?['color']);
+    final alignment = GeometryParsers.parseAlignment(styleMap?['alignment']);
+    final constraints = GeometryParsers.parseBoxConstraints(styleMap?['constraints']);
     
-    final color = StyleParsers.parseColor(
-      _getStyleProperty(styleMap, vdom, 'color')
-    );
-    
-    final alignment = StyleParsers.parseAlignment(
-      _getStyleProperty(styleMap, vdom, 'alignment')
-    );
-    
-    final constraints = StyleParsers.parseBoxConstraints(
-      _getStyleProperty(styleMap, vdom, 'constraints')
-    );
-    
-    final clipBehavior = StyleParsers.parseClipBehavior(
-      _getStyleProperty(styleMap, vdom, 'clipBehavior')
-    );
-    
-    final transformAlignment = StyleParsers.parseAlignment(
-      _getStyleProperty(styleMap, vdom, 'transformAlignment')
-    );
-    
-    final transform = StyleParsers.parseTransform(
-      _getStyleProperty(styleMap, vdom, 'transform')
-    );
+    final clipBehavior = GeometryParsers.parseClipBehavior(styleMap?['clipBehavior']);
+    final transformAlignment = GeometryParsers.parseAlignment(styleMap?['transformAlignment']);
+    final transform = GeometryParsers.parseTransform(styleMap?['transform']);
     
     // 获取id属性（用于测试和调试）
     final id = vdom.getProp<String>('id');
@@ -95,21 +61,21 @@ class ContainerComponent extends FlutterComponent {
     Decoration? decoration;
     Color? containerColor;
     
-    final decorationMap = _getStyleProperty<Map<String, dynamic>>(styleMap, vdom, 'decoration');
+    final decorationMap = styleMap?['decoration'] as Map<String, dynamic>?;
     
     if (decorationMap != null) {
       // 如果有decoration，使用decoration（可能包含color、border等）
-      decoration = StyleParsers.parseDecoration(decorationMap);
+      decoration = GeometryParsers.parseDecoration(decorationMap);
     } else if (color != null) {
       // 如果没有decoration但有color，直接使用Container.color
       containerColor = color;
     }
     
     // 解析foregroundDecoration（前景装饰，在子组件之上绘制）
-    final foregroundDecorationMap = _getStyleProperty<Map<String, dynamic>>(styleMap, vdom, 'foregroundDecoration');
+    final foregroundDecorationMap = styleMap?['foregroundDecoration'] as Map<String, dynamic>?;
     Decoration? foregroundDecoration;
     if (foregroundDecorationMap != null) {
-      foregroundDecoration = StyleParsers.parseDecoration(foregroundDecorationMap);
+      foregroundDecoration = GeometryParsers.parseDecoration(foregroundDecorationMap);
     }
     
     // 如果没有child但有width/height，添加一个空的SizedBox确保Container有尺寸
@@ -134,23 +100,6 @@ class ContainerComponent extends FlutterComponent {
       transform: transform,  // 新增Matrix4变换
       child: finalChild,
     );
-  }
-  
-  /// 获取样式属性的辅助方法
-  /// 优先从style对象中获取，否则从独立属性中获取
-  T? _getStyleProperty<T>(Map<String, dynamic>? styleMap, VirtualDOM vdom, String propertyName) {
-    // 首先尝试从style对象中获取
-    if (styleMap != null && styleMap.containsKey(propertyName)) {
-      final value = styleMap[propertyName];
-      if (value is T) return value;
-      // 尝试类型转换
-      if (T == double && value is num) return value.toDouble() as T;
-      if (T == int && value is num) return value.toInt() as T;
-      return value as T?;
-    }
-    
-    // 回退到独立属性
-    return vdom.getProp<T>(propertyName);
   }
   
 }

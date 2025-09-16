@@ -39,33 +39,101 @@ export interface ContainerStyle {
 }
 
 /**
- * 文本样式类型 (对齐Flutter Text)
+ * 文本样式类型 (对齐Flutter TextStyle)
+ * 只包含视觉样式相关属性
  */
 export interface TextStyle {
   // 字体属性
-  fontSize?: number;
-  fontWeight?: FontWeightValue;
-  fontFamily?: string;
-  fontStyle?: FontStyleValue;
+  fontSize?: number;                    // 字体大小
+  fontWeight?: FontWeightValue;         // 字体粗细
+  fontFamily?: string;                  // 字体族
+  fontStyle?: FontStyleValue;           // 字体样式(italic/normal)
   
   // 颜色和装饰
-  color?: ColorValue;
-  backgroundColor?: ColorValue;
-  decoration?: TextDecorationValue;
-  decorationColor?: string;
-  decorationStyle?: TextDecorationStyleValue;
+  color?: ColorValue;                   // 文本颜色
+  backgroundColor?: ColorValue;         // 背景颜色
+  decoration?: TextDecorationValue;     // 文本装饰(underline/strikethrough)
+  decorationColor?: ColorValue;         // 装饰颜色
+  decorationStyle?: TextDecorationStyleValue; // 装饰样式
+  decorationThickness?: number;         // 装饰线粗细
   
-  // 布局属性
-  textAlign?: TextAlignValue;
-  textDirection?: TextDirectionValue;
-  letterSpacing?: number;
-  wordSpacing?: number;
-  height?: number;
+  // 间距属性  
+  letterSpacing?: number;               // 字母间距
+  wordSpacing?: number;                 // 单词间距
+  height?: number;                      // 行高倍数
   
-  // 溢出处理
-  overflow?: TextOverflowValue;
-  maxLines?: number;
+  // 高级样式
+  shadows?: BoxShadowStyle[];           // 文本阴影
+  // 注意：Flutter的foreground/background Paint暂不实现
 }
+
+/**
+ * 按钮样式类型 (完全对齐Flutter ElevatedButton的ButtonStyle)
+ * 支持完整的Material状态管理 - 每个属性都可以为不同状态设置不同值
+ */
+export interface ElevatedButtonStyle {
+  // 颜色属性 - 支持Material状态
+  backgroundColor?: MaterialStateColorValue;     // 背景颜色
+  foregroundColor?: MaterialStateColorValue;     // 前景颜色（文本/图标颜色）
+  overlayColor?: MaterialStateColorValue;        // 覆盖色（按下/悬停时）
+  shadowColor?: MaterialStateColorValue;         // 阴影颜色
+  surfaceTintColor?: MaterialStateColorValue;    // 表面着色
+  
+  // 尺寸和间距 - 支持Material状态
+  elevation?: MaterialStateNumberValue;          // 高度/阴影深度
+  padding?: MaterialStateEdgeInsetsValue;        // 内边距
+  minimumSize?: MaterialStateSizeValue;          // 最小尺寸
+  fixedSize?: MaterialStateSizeValue;            // 固定尺寸
+  maximumSize?: MaterialStateSizeValue;          // 最大尺寸
+  
+  // 形状和边框 - 支持Material状态
+  side?: MaterialStateBorderSideValue;           // 边框
+  shape?: MaterialStateShapeValue;               // 形状
+  
+  // 鼠标和交互
+  mouseCursor?: MaterialStateMouseCursorValue;   // 鼠标指针
+  visualDensity?: VisualDensityValue;            // 视觉密度
+  tapTargetSize?: MaterialTapTargetSizeValue;    // 点击目标大小
+  animationDuration?: number;                    // 动画时长（毫秒）
+  enableFeedback?: boolean;                      // 启用触觉反馈
+  alignment?: AlignmentValue;                    // 内容对齐
+  splashFactory?: InteractiveInkFeatureFactoryValue; // 水波纹工厂
+}
+
+/**
+ * Material状态值类型 - 完全对齐Flutter MaterialState
+ */
+type MaterialStateValue<T> = T | {
+  default?: T;        // 默认状态
+  disabled?: T;       // 禁用状态
+  dragged?: T;        // 拖拽状态
+  error?: T;          // 错误状态
+  focused?: T;        // 聚焦状态
+  hovered?: T;        // 悬停状态
+  pressed?: T;        // 按下状态
+  scrolledUnder?: T;  // 滚动覆盖状态
+  selected?: T;       // 选中状态
+};
+
+// Material状态相关类型定义
+export type MaterialStateColorValue = MaterialStateValue<ColorValue>;
+export type MaterialStateNumberValue = MaterialStateValue<number>;
+export type MaterialStateEdgeInsetsValue = MaterialStateValue<EdgeInsetsValue>;
+export type MaterialStateSizeValue = MaterialStateValue<{ width?: number; height?: number }>;
+export type MaterialStateBorderSideValue = MaterialStateValue<BorderValue>;
+export type MaterialStateShapeValue = MaterialStateValue<OutlinedBorderValue>;
+export type MaterialStateMouseCursorValue = MaterialStateValue<MouseCursorValue>;
+
+// 其他Flutter对齐类型
+export type VisualDensityValue = 'standard' | 'compact' | 'comfortable' | 'adaptivePlatformDensity';
+export type MaterialTapTargetSizeValue = 'padded' | 'shrinkWrap';
+export type MouseCursorValue = 'basic' | 'click' | 'forbidden' | 'wait' | 'progress' | 'help' | 'text' | 'verticalText' | 'cell' | 'contextMenu' | 'alias' | 'copy' | 'move' | 'noDrop' | 'notAllowed' | 'grab' | 'grabbing' | 'scrollHorizontal' | 'scrollVertical' | 'resizeColumn' | 'resizeRow' | 'resizeUpLeft' | 'resizeUpRight' | 'resizeUp' | 'resizeDown' | 'resizeLeft' | 'resizeRight' | 'resizeUpLeftDownRight' | 'resizeUpRightDownLeft' | 'zoomIn' | 'zoomOut';
+export type InteractiveInkFeatureFactoryValue = 'splash' | 'ripple' | 'noSplash';
+export type OutlinedBorderValue = BorderRadiusValue | {
+  type: 'RoundedRectangleBorder' | 'CircleBorder' | 'StadiumBorder' | 'BeveledRectangleBorder';
+  borderRadius?: BorderRadiusValue;
+  side?: BorderValue;
+};
 
 /**
  * 列布局样式类型 (对齐Flutter Column)
@@ -87,6 +155,17 @@ export interface RowStyle {
   mainAxisSize?: MainAxisSizeValue;
   textDirection?: TextDirectionValue;
   verticalDirection?: VerticalDirectionValue;
+  textBaseline?: TextBaselineValue;
+}
+
+/**
+ * 单子组件滚动视图样式类型 (对齐Flutter SingleChildScrollView)
+ */
+export interface SingleChildScrollViewStyle {
+  // 视觉样式属性
+  padding?: EdgeInsetsValue;
+  physics?: ScrollPhysicsValue;
+  clipBehavior?: ClipBehaviorValue;
 }
 
 // =============================================================================
@@ -161,7 +240,16 @@ export type MainAxisSizeValue = 'min' | 'max';
 
 export type VerticalDirectionValue = 'up' | 'down';
 
+/**
+ * 文本基线值类型 (对齐Flutter TextBaseline枚举)
+ */
+export type TextBaselineValue = 'alphabetic' | 'ideographic';
+
 export type ClipBehaviorValue = 'none' | 'hardEdge' | 'antiAlias' | 'antiAliasWithSaveLayer';
+
+export type ScrollDirectionValue = 'vertical' | 'horizontal';
+
+export type ScrollPhysicsValue = 'bouncing' | 'clamping' | 'never';
 
 export type BorderStyleValue = 'none' | 'solid';
 

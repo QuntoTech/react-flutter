@@ -13,8 +13,9 @@ class SizedBoxComponent extends FlutterComponent {
   
   @override
   Map<String, Type> get supportedProps => {
-    'width': double,
-    'height': double,
+    'width': double,           // 宽度
+    'height': double,          // 高度  
+    'id': String,              // 标识属性
   };
   
   @override
@@ -24,6 +25,7 @@ class SizedBoxComponent extends FlutterComponent {
   Widget build(VirtualDOM vdom) {
     final width = vdom.getProp<double>('width');
     final height = vdom.getProp<double>('height');
+    final id = vdom.getProp<String>('id');
     
     // 统一、递归地构建所有子元素
     final List<Widget> childrenWidgets = vdom.getChildrenList()
@@ -37,6 +39,7 @@ class SizedBoxComponent extends FlutterComponent {
     final Widget? child = childrenWidgets.isNotEmpty ? childrenWidgets.first : null;
     
     return SizedBox(
+      key: id != null ? Key(id) : null,
       width: width,
       height: height,
       child: child,

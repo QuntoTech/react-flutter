@@ -84,20 +84,25 @@ function styleSheetInherit(styledComponent: StyledComponent) {
 // StyleSheet对象定义
 // =============================================================================
 
-// 先定义基础组件包装器
-const createBaseComponent = (componentType: string) => {
-  return React.forwardRef<any, any>(({ children, style, ...props }, ref) => {
-    return React.createElement(componentType, { ...props, style, ref }, children);
-  });
-};
+// 注：不再需要createBaseComponent，因为所有组件都有真正的React实现
+
+// 导入实际的React组件
+import { Container } from '../container';
+import { ElevatedButton } from '../elevated-button';
+import { Text } from '../text';
+import { Column } from '../column';
+import { Row } from '../row';
+import { SizedBox } from '../sized-box';
+import { SingleChildScrollView } from '../single-child-scroll-view';
 
 // 基础组件定义
-const BaseContainer = createBaseComponent('Container');
-const BaseText = createBaseComponent('Text');
-const BaseColumn = createBaseComponent('Column');
-const BaseRow = createBaseComponent('Row');
-const BaseSizedBox = createBaseComponent('SizedBox');
-const BaseElevatedButton = createBaseComponent('ElevatedButton');
+const BaseContainer = Container; // 直接使用React组件
+const BaseText = Text; // 直接使用React组件
+const BaseColumn = Column; // 直接使用React组件
+const BaseRow = Row; // 直接使用React组件
+const BaseSizedBox = SizedBox; // 直接使用React组件
+const BaseElevatedButton = ElevatedButton; // 直接使用React组件
+const BaseSingleChildScrollView = SingleChildScrollView; // 直接使用React组件
 
 /**
  * StyleSheet对象 - 提供基础组件的样式化功能
@@ -136,6 +141,11 @@ export const styleSheet = {
    * ElevatedButton组件样式化
    */
   ElevatedButton: (styles: any) => createStyledComponent(BaseElevatedButton, styles),
+
+  /**
+   * SingleChildScrollView组件样式化
+   */
+  SingleChildScrollView: (styles: any) => createStyledComponent(BaseSingleChildScrollView, styles),
 } as const;
 
 // 创建带函数调用支持的styleSheet

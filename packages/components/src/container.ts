@@ -9,7 +9,7 @@ import { mergeStyles } from './styles/merge-styles';
 
 export interface ContainerProps {
   children?: React.ReactNode;
-  style?: ContainerStyle | ContainerStyle[];
+  style?: ContainerStyle;
   id?: string;  // 通用id属性，用于测试和查找
 }
 

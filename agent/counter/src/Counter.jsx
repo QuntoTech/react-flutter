@@ -1,5 +1,107 @@
 import React from 'react';
-import { Container, Column, Text, EdgeInsets, Color } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, ElevatedButton, Color } from '@react-flutter/components';
+import { 
+  BasicStyleCard, 
+  LinearGradientCard, 
+  RadialGradientCard, 
+  MainScrollView,
+  CircleCard,
+  AlignmentCard,
+  ConstraintsCard,
+  ForegroundDecorationCard,
+  ClipBehaviorCard,
+  OverflowContainer,
+  TransformAlignmentCard,
+  TransformCard,
+  ColumnDemoCard,
+  ColumnItem1,
+  ColumnItem2,
+  ColumnItem3,
+  RowDemoCard,
+  RowItem1,
+  RowItem2,
+  RowItem3,
+  TextDemoCard,
+  TitleText,
+  BodyText,
+  StyledText,
+  EllipsisText,
+  SizedBoxDemoCard,
+  FixedSizeBox,
+  SpacerBox,
+  ElevatedButtonDemoCard,
+  BasicElevatedButton,
+  StatefulElevatedButton,
+  LargeElevatedButton,
+  CircularElevatedButton
+} from './styled';
+
+const ElevatedButtonDemoContainer = () => (
+  <ElevatedButtonDemoCard id="elevated-button-demo">
+    <Column crossAxisAlignment="start">
+      <Text text="ElevatedButton 按钮演示" style={{ fontSize: 16, color: Color.white, fontWeight: 'bold' }} />
+      
+      {/* 基础按钮 */}
+      <Column crossAxisAlignment="start">
+        <Text text="基础按钮" style={{ fontSize: 12, color: Color.white }} />
+        <BasicElevatedButton 
+          id="basic-elevated-button"
+          onPressed={() => console.log('基础按钮点击')}
+        >
+          <Text text="点击我" style={{ fontSize: 14, color: Color.white }} />
+        </BasicElevatedButton>
+      </Column>
+
+      <SizedBox height={16} />
+
+      {/* Material状态按钮 */}
+      <Column crossAxisAlignment="start">
+        <Text text="状态响应按钮" style={{ fontSize: 12, color: Color.white }} />
+        <Row>
+          <StatefulElevatedButton 
+            id="stateful-elevated-button"
+            onPressed={() => console.log('状态按钮点击')}
+          >
+            <Text text="交互状态" style={{ fontSize: 14, color: Color.white }} />
+          </StatefulElevatedButton>
+          
+          <SizedBox width={12} />
+          
+          <StatefulElevatedButton 
+            id="disabled-elevated-button"
+            onPressed={null}  // 禁用状态
+          >
+            <Text text="禁用状态" style={{ fontSize: 14, color: Color.fromRGBO(158, 158, 158, 1.0) }} />
+          </StatefulElevatedButton>
+        </Row>
+      </Column>
+
+      <SizedBox height={16} />
+
+      {/* 不同尺寸按钮 */}
+      <Column crossAxisAlignment="start">
+        <Text text="尺寸演示" style={{ fontSize: 12, color: Color.white }} />
+        <Row crossAxisAlignment="center">
+          <LargeElevatedButton 
+            id="large-elevated-button"
+            onPressed={() => console.log('大按钮点击')}
+          >
+            <Text text="大尺寸按钮" style={{ fontSize: 16, color: Color.white, fontWeight: 'bold' }} />
+          </LargeElevatedButton>
+          
+          <SizedBox width={16} />
+          
+          <CircularElevatedButton 
+            id="circular-elevated-button"
+            onPressed={() => console.log('圆形按钮点击')}
+          >
+            <Text text="+" style={{ fontSize: 24, color: Color.white, fontWeight: 'bold' }} />
+          </CircularElevatedButton>
+        </Row>
+      </Column>
+    </Column>
+  </ElevatedButtonDemoCard>
+);
 
 /**
  * Container组件功能展示
@@ -8,234 +110,223 @@ import { Container, Column, Text, EdgeInsets, Color } from '@react-flutter/compo
 const Counter = () => {
   // 展示基础样式：颜色+圆角+阴影+边框
   const BasicStyleContainer = () => (
-    <Container id="basic-style-demo" style={{
-      width: 250,
-      height: 80,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(33, 150, 243, 1.0),
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 },
-        boxShadow: [{
-          color: Color.fromRGBO(0, 0, 0, 0.3),
-          blurRadius: 8,
-          offset: { dx: 0, dy: 4 },
-          spreadRadius: 1,
-          blurStyle: 'normal'
-        }],
-        border: {
-          top: { color: Color.white, width: 2, style: 'solid' },
-          right: { color: Color.white, width: 2, style: 'solid' },
-          bottom: { color: Color.white, width: 2, style: 'solid' },
-          left: { color: Color.white, width: 2, style: 'solid' }
-        }
-      }
-    }}>
+    <BasicStyleCard id="basic-style-demo">
       <Text text="基础样式：颜色+圆角+阴影+边框" fontSize={12} color={Color.white} />
-    </Container>
+    </BasicStyleCard>
   );
 
   // 展示线性渐变
   const LinearGradientContainer = () => (
-    <Container id="linear-gradient-demo" style={{
-      width: 250,
-      height: 80,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      decoration: {
-        gradient: {
-          type: 'linear',
-          colors: [
-            Color.fromRGBO(255, 87, 34, 1.0),   // 橙色
-            Color.fromRGBO(255, 193, 7, 1.0)    // 黄色
-          ],
-          begin: { x: 0, y: 0 },
-          end: { x: 1, y: 1 },
-          tileMode: 'clamp'
-        },
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }
-      }
-    }}>
+    <LinearGradientCard id="linear-gradient-demo">
       <Text text="线性渐变：橙色到黄色" fontSize={12} color={Color.white} />
-    </Container>
+    </LinearGradientCard>
   );
 
   // 展示径向渐变
   const RadialGradientContainer = () => (
-    <Container id="radial-gradient-demo" style={{
-      width: 250,
-      height: 80,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      decoration: {
-        gradient: {
-          type: 'radial',
-          colors: [
-            Color.fromRGBO(156, 39, 176, 1.0),   // 紫色
-            Color.fromRGBO(63, 81, 181, 1.0)     // 蓝紫色
-          ],
-          center: { x: 0.5, y: 0.5 },
-          radius: 0.8,
-          tileMode: 'clamp'
-        },
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }
-      }
-    }}>
+    <RadialGradientCard id="radial-gradient-demo">
       <Text text="径向渐变：紫色到蓝紫色" fontSize={12} color={Color.white} />
-    </Container>
+    </RadialGradientCard>
   );
 
   // 展示圆形形状
   const CircleShapeContainer = () => (
-    <Container id="circle-shape-demo" style={{
-      width: 100,
-      height: 100,
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(76, 175, 80, 1.0),  // 绿色
-        shape: 'circle'
-      }
-    }}>
+    <CircleCard id="circle-shape-demo">
       <Text text="圆形" fontSize={12} color={Color.white} />
-    </Container>
+    </CircleCard>
   );
 
   // 展示alignment对齐功能
   const AlignmentDemoContainer = () => (
-    <Container id="alignment-demo" style={{
-      width: 250,
-      height: 80,
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(233, 30, 99, 1.0),  // 粉色
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }
-      },
-      alignment: 'bottomRight'  // 新增：右下角对齐
-    }}>
+    <AlignmentCard id="alignment-demo">
       <Text text="右下角对齐文本" fontSize={12} color={Color.white} />
-    </Container>
+    </AlignmentCard>
   );
 
   // 展示constraints约束功能
   const ConstraintsDemoContainer = () => (
-    <Container id="constraints-demo" style={{
-      margin: EdgeInsets.all(10),
-      constraints: {
-        minWidth: 150,
-        maxWidth: 300,
-        minHeight: 80,
-        maxHeight: 120
-      },
-      decoration: {
-        color: Color.fromRGBO(76, 175, 80, 1.0),  // 绿色
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }
-      },
-      alignment: 'center'
-    }}>
+    <ConstraintsCard id="constraints-demo">
       <Text text="约束: 150-300x80-120" fontSize={12} color={Color.white} />
-    </Container>
+    </ConstraintsCard>
   );
 
   // 展示foregroundDecoration前景装饰功能
   const ForegroundDecorationDemoContainer = () => (
-    <Container id="foreground-decoration-demo" style={{
-      width: 250,
-      height: 80,
-      padding: EdgeInsets.all(15),
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(63, 81, 181, 1.0),  // 靛蓝色背景
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }
-      },
-      foregroundDecoration: {
-        border: {
-          top: { color: Color.fromRGBO(255, 193, 7, 1.0), width: 3, style: 'solid' },    // 金色边框
-          right: { color: Color.fromRGBO(255, 193, 7, 1.0), width: 3, style: 'solid' },
-          bottom: { color: Color.fromRGBO(255, 193, 7, 1.0), width: 3, style: 'solid' },
-          left: { color: Color.fromRGBO(255, 193, 7, 1.0), width: 3, style: 'solid' }
-        },
-        borderRadius: { topLeft: 15, topRight: 15, bottomRight: 15, bottomLeft: 15 }  // 保持与背景一致
-      }
-    }}>
+    <ForegroundDecorationCard id="foreground-decoration-demo">
       <Text text="前景装饰：金色边框覆盖层" fontSize={12} color={Color.white} />
-    </Container>
+    </ForegroundDecorationCard>
   );
 
   // 展示clipBehavior裁剪行为功能
   const ClipBehaviorDemoContainer = () => (
-    <Container id="clip-behavior-demo" style={{
-      width: 200,
-      height: 80,
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(156, 39, 176, 1.0),  // 紫色背景
-        borderRadius: { topLeft: 20, topRight: 20, bottomRight: 20, bottomLeft: 20 }
-      },
-      clipBehavior: 'antiAlias'  // 抗锯齿裁剪
-    }}>
-      <Container style={{
-        width: 300,  // 故意超出父容器宽度
-        height: 120, // 故意超出父容器高度
-        decoration: {
-          color: Color.fromRGBO(255, 235, 59, 0.8)  // 半透明黄色，展示裁剪效果
-        }
-      }}>
+    <ClipBehaviorCard id="clip-behavior-demo">
+      <OverflowContainer>
         <Text text="裁剪演示：超出部分被裁剪" fontSize={12} color={Color.black} />
-      </Container>
-    </Container>
+      </OverflowContainer>
+    </ClipBehaviorCard>
   );
 
   // 展示transformAlignment变换中心点功能
   const TransformAlignmentDemoContainer = () => (
-    <Container id="transform-alignment-demo" style={{
-      width: 200,
-      height: 80,
-      margin: EdgeInsets.all(10),
-      decoration: {
-        color: Color.fromRGBO(255, 87, 34, 1.0),  // 橙红色背景
-        borderRadius: { topLeft: 10, topRight: 10, bottomRight: 10, bottomLeft: 10 }
-      },
-      transformAlignment: 'topLeft'  // 设置变换中心点为左上角
-    }}>
+    <TransformAlignmentCard id="transform-alignment-demo">
       <Text text="变换中心点：左上角对齐" fontSize={12} color={Color.white} />
-    </Container>
+    </TransformAlignmentCard>
   );
 
   // 展示transform Matrix4变换功能
   const TransformDemoContainer = () => (
-    <Container id="transform-demo" style={{
-      width: 150,
-      height: 60,
-      margin: EdgeInsets.all(20),
-      decoration: {
-        color: Color.fromRGBO(121, 85, 72, 1.0),  // 棕色背景
-        borderRadius: { topLeft: 8, topRight: 8, bottomRight: 8, bottomLeft: 8 }
-      },
-      transformAlignment: 'center',
-      transform: [
-        1.2, 0.0, 0.0, 0.0,    // 缩放X=1.2
-        0.0, 1.2, 0.0, 0.0,    // 缩放Y=1.2
-        0.0, 0.0, 1.0, 0.0,    // Z轴不变
-        0.0, 0.0, 0.0, 1.0     // 齐次坐标
-      ]  // Matrix4缩放1.2倍
-    }}>
+    <TransformCard id="transform-demo">
       <Text text="Matrix4变换：缩放1.2倍" fontSize={11} color={Color.white} />
-    </Container>
+    </TransformCard>
+  );
+
+  // Column布局演示组件
+  const ColumnDemoContainer = () => (
+    <ColumnDemoCard id="column-demo">
+      <Column 
+        id="demo-column"
+        mainAxisAlignment="spaceEvenly"
+        crossAxisAlignment="center"
+        mainAxisSize="max"
+      >
+        <Text text="Column演示" fontSize={14} color={Color.white} />
+        <ColumnItem1>
+          <Text text="项目1" fontSize={10} color={Color.black} />
+        </ColumnItem1>
+        <ColumnItem2>
+          <Text text="项目2" fontSize={10} color={Color.black} />
+        </ColumnItem2>
+        <ColumnItem3>
+          <Text text="项目3" fontSize={10} color={Color.black} />
+        </ColumnItem3>
+      </Column>
+    </ColumnDemoCard>
+  );
+
+  // Row布局演示组件
+  const RowDemoContainer = () => (
+    <RowDemoCard id="row-demo">
+      <Column>
+        <Text text="Row演示" fontSize={14} color={Color.white} />
+        <Row
+          id="demo-row"
+          mainAxisAlignment="spaceEvenly"
+          crossAxisAlignment="center"
+          mainAxisSize="max"
+        >
+          <RowItem1>
+            <Text text="A" fontSize={10} color={Color.black} />
+          </RowItem1>
+          <RowItem2>
+            <Text text="B" fontSize={10} color={Color.black} />
+          </RowItem2>
+          <RowItem3>
+            <Text text="C" fontSize={10} color={Color.black} />
+          </RowItem3>
+        </Row>
+      </Column>
+    </RowDemoCard>
+  );
+
+  // Text文本组件演示
+  const TextDemoContainer = () => (
+    <TextDemoCard id="text-demo">
+      <Column mainAxisAlignment="spaceEvenly" crossAxisAlignment="start">
+        <TitleText 
+          id="title-text"
+          text="Text组件演示" 
+        />
+        <BodyText 
+          id="body-text"
+          text="这是一段普通文本，展示了基础的字体样式和行高设置。支持多行显示和自动换行。" 
+          maxLines={3}
+          textAlign="left"
+        />
+        <StyledText 
+          id="styled-text"
+          text="这是样式文本：加粗、金色、下划线、字母间距" 
+        />
+        <EllipsisText 
+          id="ellipsis-text"
+          text="这是一段很长的文本，用来演示溢出处理，当文本超过容器宽度时会显示省略号..." 
+          maxLines={1}
+          overflow="ellipsis"
+        />
+      </Column>
+    </TextDemoCard>
+  );
+
+  // SizedBox尺寸控制组件演示
+  const SizedBoxDemoContainer = () => (
+    <SizedBoxDemoCard id="sizedbox-demo">
+      <Column mainAxisAlignment="spaceEvenly" crossAxisAlignment="start">
+        <Text text="SizedBox演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+        
+        {/* 固定尺寸演示 */}
+        <Row mainAxisAlignment="spaceAround" crossAxisAlignment="center">
+          <SizedBox width={50} height={30} id="fixed-size-box">
+            <FixedSizeBox>
+              <Text text="50x30" style={{ fontSize: 10, color: Color.black }} textAlign="center" />
+            </FixedSizeBox>
+          </SizedBox>
+          
+          <SizedBox width={80} height={40} id="larger-size-box">
+            <FixedSizeBox>
+              <Text text="80x40" style={{ fontSize: 12, color: Color.black }} textAlign="center" />
+            </FixedSizeBox>
+          </SizedBox>
+          
+          <SizedBox width={60} height={60} id="square-size-box">
+            <FixedSizeBox>
+              <Text text="60x60" style={{ fontSize: 10, color: Color.black }} textAlign="center" />
+            </FixedSizeBox>
+          </SizedBox>
+        </Row>
+
+        {/* 间距控制演示 */}
+        <Column crossAxisAlignment="start">
+          <Text text="间距控制" style={{ fontSize: 12, color: Color.white }} />
+          <Row>
+            <SpacerBox>
+              <Text text="项目A" style={{ fontSize: 10, color: Color.black }} />
+            </SpacerBox>
+            <SizedBox width={20} id="spacer-20" />
+            <SpacerBox>
+              <Text text="项目B" style={{ fontSize: 10, color: Color.black }} />
+            </SpacerBox>
+            <SizedBox width={40} id="spacer-40" />
+            <SpacerBox>
+              <Text text="项目C" style={{ fontSize: 10, color: Color.black }} />
+            </SpacerBox>
+          </Row>
+        </Column>
+      </Column>
+    </SizedBoxDemoCard>
   );
 
   return (
-    <Column>
-      <BasicStyleContainer />
-      <LinearGradientContainer />
-      <RadialGradientContainer />
-      <CircleShapeContainer />
-      <AlignmentDemoContainer />
-      <ConstraintsDemoContainer />
-      <ForegroundDecorationDemoContainer />
-      <ClipBehaviorDemoContainer />
-      <TransformAlignmentDemoContainer />
-      <TransformDemoContainer />
-    </Column>
+    <MainScrollView 
+      id="main-scroll-view"
+      scrollDirection="vertical"
+    >
+      <Column>
+        <BasicStyleContainer />
+        <LinearGradientContainer />
+        <RadialGradientContainer />
+        <CircleShapeContainer />
+        <AlignmentDemoContainer />
+        <ConstraintsDemoContainer />
+        <ForegroundDecorationDemoContainer />
+        <ClipBehaviorDemoContainer />
+        <TransformAlignmentDemoContainer />
+        <TransformDemoContainer />
+        <ColumnDemoContainer />
+        <RowDemoContainer />
+        <TextDemoContainer />
+        <SizedBoxDemoContainer />
+        <ElevatedButtonDemoContainer />
+      </Column>
+    </MainScrollView>
   );
 };
 

@@ -3,6 +3,7 @@ import '../base/flutter_component.dart';
 import '../../core/virtual_dom_parser.dart';
 import '../../core/component_registry.dart';
 import '../../utils/type_converters.dart';
+import '../../utils/style_parsers/index.dart';
 
 /// Row组件映射
 class RowComponent extends FlutterComponent {
@@ -14,9 +15,13 @@ class RowComponent extends FlutterComponent {
   
   @override
   Map<String, Type> get supportedProps => {
-    'mainAxisAlignment': String,
-    'crossAxisAlignment': String,
-    'mainAxisSize': String,
+    'mainAxisAlignment': String,    // 主轴对齐
+    'crossAxisAlignment': String,   // 交叉轴对齐
+    'mainAxisSize': String,        // 主轴大小
+    'textDirection': String,       // 文本方向
+    'verticalDirection': String,   // 垂直方向
+    'textBaseline': String,        // 文本基线
+    'id': String,                  // 标识属性
   };
   
   @override
@@ -24,7 +29,7 @@ class RowComponent extends FlutterComponent {
   
   @override
   Widget build(VirtualDOM vdom) {
-    // 解析对齐属性
+    // 解析所有Row属性
     final mainAxisAlignment = TypeConverters.parseMainAxisAlignment(
       vdom.getProp<String>('mainAxisAlignment')
     );
@@ -39,6 +44,18 @@ class RowComponent extends FlutterComponent {
       mainAxisSize = MainAxisSize.min;
     }
     
+    // 解析新增属性
+    final textDirection = TextParsers.parseTextDirection(
+      vdom.getProp<String>('textDirection')
+    );
+    final verticalDirection = TextParsers.parseVerticalDirection(
+      vdom.getProp<String>('verticalDirection')
+    );
+    final textBaseline = TextParsers.parseTextBaseline(
+      vdom.getProp<String>('textBaseline')
+    );
+    final id = vdom.getProp<String>('id');
+    
     // 构建子组件
     final children = <Widget>[];
     for (final child in vdom.getChildrenList()) {
@@ -49,9 +66,13 @@ class RowComponent extends FlutterComponent {
     }
     
     return Row(
+      key: id != null ? Key(id) : null,
       mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       mainAxisSize: mainAxisSize,
+      textDirection: textDirection,
+      verticalDirection: verticalDirection,
+      textBaseline: textBaseline,
       children: children,
     );
   }
