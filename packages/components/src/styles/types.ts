@@ -100,6 +100,7 @@ export interface DecorationStyle {
   boxShadow?: BoxShadowStyle[];
   gradient?: GradientStyle;
   image?: DecorationImageStyle;
+  shape?: BoxShapeValue;
 }
 
 // BorderStyle已被Border类替代，保留用于向后兼容
@@ -114,6 +115,7 @@ export interface BoxShadowStyle {
   blurRadius?: number;
   spreadRadius?: number;
   offset?: { dx: number; dy: number };
+  blurStyle?: BlurStyleValue;
 }
 
 export interface ConstraintsStyle {
@@ -163,34 +165,81 @@ export type ClipBehaviorValue = 'none' | 'hardEdge' | 'antiAlias' | 'antiAliasWi
 
 export type BorderStyleValue = 'none' | 'solid';
 
+export type BlurStyleValue = 'normal' | 'solid' | 'outer' | 'inner';
 
-export type TransformValue = {
-  // 2D变换
-  translateX?: number;
-  translateY?: number;
-  scaleX?: number;
-  scaleY?: number;
-  rotateZ?: number;
-  // 3D变换
-  translateZ?: number;
-  scaleZ?: number;
-  rotateX?: number;
-  rotateY?: number;
+export type TileModeValue = 'clamp' | 'repeated' | 'mirror';
+
+export type GradientTransformValue = {
+  // 2D变换矩阵 (对齐Flutter GradientTransform)
+  matrix?: number[];  // 4x4变换矩阵
+  // 简化变换属性
+  rotation?: number;  // 旋转角度 (弧度)
+  scale?: number;     // 缩放比例
+  translation?: { dx: number; dy: number }; // 平移
 };
 
-export type GradientStyle = {
-  type: 'linear' | 'radial';
-  colors: string[];
-  stops?: number[];
-  begin?: AlignmentValue;
-  end?: AlignmentValue;
-};
 
-export type DecorationImageStyle = {
+// Matrix4变换值 - 完全对齐Flutter Matrix4 API
+export type TransformValue = number[];  // 16个数字，表示4x4变换矩阵
+
+/**
+ * 渐变样式类型 - 完全对齐Flutter Gradient API
+ */
+export type GradientStyle = LinearGradientStyle | RadialGradientStyle | SweepGradientStyle;
+
+/**
+ * 线性渐变样式 (对齐Flutter LinearGradient)
+ */
+export interface LinearGradientStyle {
+  type: 'linear';
+  begin?: AlignmentValue;           // 默认: Alignment.centerLeft
+  end?: AlignmentValue;             // 默认: Alignment.centerRight
+  colors: ColorValue[];             // 必需: 渐变颜色列表
+  stops?: number[];                 // 可选: 颜色停止位置
+  tileMode?: TileModeValue;         // 默认: 'clamp'
+  transform?: GradientTransformValue; // 可选: 渐变变换
+}
+
+/**
+ * 径向渐变样式 (对齐Flutter RadialGradient)
+ */
+export interface RadialGradientStyle {
+  type: 'radial';
+  center?: AlignmentValue;          // 默认: Alignment.center
+  radius?: number;                  // 默认: 0.5
+  colors: ColorValue[];             // 必需: 渐变颜色列表
+  stops?: number[];                 // 可选: 颜色停止位置
+  tileMode?: TileModeValue;         // 默认: 'clamp'
+  focal?: AlignmentValue;           // 可选: 焦点位置
+  focalRadius?: number;             // 默认: 0.0
+  transform?: GradientTransformValue; // 可选: 渐变变换
+}
+
+/**
+ * 扫描渐变样式 (对齐Flutter SweepGradient)
+ */
+export interface SweepGradientStyle {
+  type: 'sweep';
+  center?: AlignmentValue;          // 默认: Alignment.center
+  startAngle?: number;              // 默认: 0.0 (弧度)
+  endAngle?: number;                // 默认: 2π (弧度)
+  colors: ColorValue[];             // 必需: 渐变颜色列表
+  stops?: number[];                 // 可选: 颜色停止位置
+  tileMode?: TileModeValue;         // 默认: 'clamp'
+  transform?: GradientTransformValue; // 可选: 渐变变换
+}
+
+export interface DecorationImageStyle {
   url: string;
-  fit?: 'fill' | 'contain' | 'cover' | 'fitWidth' | 'fitHeight' | 'none' | 'scaleDown';
-  repeat?: 'repeat' | 'repeatX' | 'repeatY' | 'noRepeat';
-};
+  fit?: BoxFitValue;
+  repeat?: ImageRepeatValue;
+}
+
+export type BoxFitValue = 'fill' | 'contain' | 'cover' | 'fitWidth' | 'fitHeight' | 'none' | 'scaleDown';
+
+export type ImageRepeatValue = 'repeat' | 'repeatX' | 'repeatY' | 'noRepeat';
+
+export type BoxShapeValue = 'rectangle' | 'circle';
 
 // =============================================================================
 // StyleSheet相关类型

@@ -53,10 +53,17 @@ function convertStyleForFlutter(style: any): any {
       // 递归处理嵌套对象（如decoration）
       converted[key] = convertStyleForFlutter(value);
     } else if (Array.isArray(value)) {
-      // 处理数组（如boxShadow）
-      converted[key] = value.map(item => 
-        typeof item === 'object' && item !== null ? convertStyleForFlutter(item) : item
-      );
+      // 处理数组（如boxShadow、gradient.colors）
+      converted[key] = value.map(item => {
+        if (item instanceof Color) {
+          // 数组中的Color对象需要转换
+          return item.toFlutterMap();
+        } else if (typeof item === 'object' && item !== null) {
+          return convertStyleForFlutter(item);
+        } else {
+          return item;
+        }
+      });
     } else {
       converted[key] = value;
     }

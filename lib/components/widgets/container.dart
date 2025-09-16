@@ -3,6 +3,10 @@ import '../base/flutter_component.dart';
 import '../../core/virtual_dom_parser.dart';
 import '../../core/component_registry.dart';
 import '../../utils/type_converters.dart';
+import '../../utils/style_parsers.dart';
+
+// 开发模式调试输出控制
+const bool _kDebugMode = false;
 
 /// Container组件映射
 class ContainerComponent extends FlutterComponent {
@@ -22,6 +26,13 @@ class ContainerComponent extends FlutterComponent {
     'height': double,
     'color': String,
     'decoration': Map,
+    'foregroundDecoration': Map,  // 新增foregroundDecoration属性
+    'alignment': String,  // 新增alignment属性
+    'constraints': Map,   // 新增constraints属性
+    'clipBehavior': String,       // 新增clipBehavior属性
+    'transformAlignment': String, // 新增transformAlignment属性
+    'transform': List,            // 新增transform属性
+    'id': String,         // 通用id属性，用于测试和查找
   };
   
   @override
@@ -36,16 +47,39 @@ class ContainerComponent extends FlutterComponent {
     final width = _getStyleProperty<double>(styleMap, vdom, 'width');
     final height = _getStyleProperty<double>(styleMap, vdom, 'height');
     
-    final padding = _parseEdgeInsets(
+    final padding = StyleParsers.parseEdgeInsets(
       _getStyleProperty(styleMap, vdom, 'padding')
     );
-    final margin = _parseEdgeInsets(
+    final margin = StyleParsers.parseEdgeInsets(
       _getStyleProperty(styleMap, vdom, 'margin')
     );
     
-    final color = _parseColor(
+    final color = StyleParsers.parseColor(
       _getStyleProperty(styleMap, vdom, 'color')
     );
+    
+    final alignment = StyleParsers.parseAlignment(
+      _getStyleProperty(styleMap, vdom, 'alignment')
+    );
+    
+    final constraints = StyleParsers.parseBoxConstraints(
+      _getStyleProperty(styleMap, vdom, 'constraints')
+    );
+    
+    final clipBehavior = StyleParsers.parseClipBehavior(
+      _getStyleProperty(styleMap, vdom, 'clipBehavior')
+    );
+    
+    final transformAlignment = StyleParsers.parseAlignment(
+      _getStyleProperty(styleMap, vdom, 'transformAlignment')
+    );
+    
+    final transform = StyleParsers.parseTransform(
+      _getStyleProperty(styleMap, vdom, 'transform')
+    );
+    
+    // 获取id属性（用于测试和调试）
+    final id = vdom.getProp<String>('id');
     
     // 统一、递归地构建所有子元素
     final List<Widget> childrenWidgets = vdom.getChildrenList()
@@ -62,22 +96,43 @@ class ContainerComponent extends FlutterComponent {
     Color? containerColor;
     
     final decorationMap = _getStyleProperty<Map<String, dynamic>>(styleMap, vdom, 'decoration');
+    
     if (decorationMap != null) {
       // 如果有decoration，使用decoration（可能包含color、border等）
-      decoration = _parseDecoration(decorationMap);
+      decoration = StyleParsers.parseDecoration(decorationMap);
     } else if (color != null) {
       // 如果没有decoration但有color，直接使用Container.color
       containerColor = color;
     }
     
+    // 解析foregroundDecoration（前景装饰，在子组件之上绘制）
+    final foregroundDecorationMap = _getStyleProperty<Map<String, dynamic>>(styleMap, vdom, 'foregroundDecoration');
+    Decoration? foregroundDecoration;
+    if (foregroundDecorationMap != null) {
+      foregroundDecoration = StyleParsers.parseDecoration(foregroundDecorationMap);
+    }
+    
+    // 如果没有child但有width/height，添加一个空的SizedBox确保Container有尺寸
+    Widget? finalChild = child;
+    if (child == null && (width != null || height != null)) {
+      finalChild = const SizedBox.expand();
+    }
+    
     return Container(
+      key: id != null ? Key(id) : null,  // 使用id作为key
       width: width,
       height: height,
       padding: padding,
       margin: margin,
       color: containerColor,
       decoration: decoration,
-      child: child,
+      foregroundDecoration: foregroundDecoration,  // 新增前景装饰
+      alignment: alignment,
+      constraints: constraints,
+      clipBehavior: clipBehavior,  // 新增裁剪行为
+      transformAlignment: transformAlignment,  // 新增变换中心点
+      transform: transform,  // 新增Matrix4变换
+      child: finalChild,
     );
   }
   
@@ -98,143 +153,4 @@ class ContainerComponent extends FlutterComponent {
     return vdom.getProp<T>(propertyName);
   }
   
-  /// 解析EdgeInsets值
-  /// React端已统一转换格式，Flutter端直接解析
-  EdgeInsets? _parseEdgeInsets(dynamic value) {
-    if (value == null) return null;
-    
-    // React端已转换为标准格式：{top, right, bottom, left}
-    if (value is Map<String, dynamic>) {
-      final top = (value['top'] ?? 0).toDouble();
-      final right = (value['right'] ?? 0).toDouble();
-      final bottom = (value['bottom'] ?? 0).toDouble();
-      final left = (value['left'] ?? 0).toDouble();
-      
-      return EdgeInsets.fromLTRB(left, top, right, bottom);
-    }
-    
-    return null;
-  }
-  
-  /// 解析Color值
-  /// React端已统一转换格式，Flutter端直接解析
-  Color? _parseColor(dynamic value) {
-    if (value == null) return null;
-    
-    // React端已转换为标准格式：{value: int}
-    if (value is Map<String, dynamic> && value.containsKey('value')) {
-      final colorValue = value['value'];
-      if (colorValue is int) {
-        return Color(colorValue);
-      }
-    }
-    
-    return null;
-  }
-  
-  /// 解析BorderRadius值
-  /// React端已统一转换格式，Flutter端直接解析
-  BorderRadius? _parseBorderRadius(dynamic value) {
-    if (value == null) return null;
-    
-    // React端已转换为标准格式：{topLeft, topRight, bottomRight, bottomLeft}
-    if (value is Map<String, dynamic>) {
-      final topLeft = (value['topLeft'] ?? 0).toDouble();
-      final topRight = (value['topRight'] ?? 0).toDouble(); 
-      final bottomRight = (value['bottomRight'] ?? 0).toDouble();
-      final bottomLeft = (value['bottomLeft'] ?? 0).toDouble();
-      
-      return BorderRadius.only(
-        topLeft: Radius.circular(topLeft),
-        topRight: Radius.circular(topRight),
-        bottomRight: Radius.circular(bottomRight),
-        bottomLeft: Radius.circular(bottomLeft),
-      );
-    }
-    
-    return null;
-  }
-  
-  /// 解析Border值
-  /// 支持完整Border对象格式和简化格式（向后兼容）
-  Border? _parseBorder(dynamic value) {
-    if (value == null) return null;
-    
-    // 完整Border对象格式：{top: {color, width, style}, right: {...}, ...}
-    if (value is Map<String, dynamic> && value.containsKey('top')) {
-      final topSide = _parseBorderSide(value['top']);
-      final rightSide = _parseBorderSide(value['right']);
-      final bottomSide = _parseBorderSide(value['bottom']);
-      final leftSide = _parseBorderSide(value['left']);
-      
-      return Border(
-        top: topSide ?? BorderSide.none,
-        right: rightSide ?? BorderSide.none,
-        bottom: bottomSide ?? BorderSide.none,
-        left: leftSide ?? BorderSide.none,
-      );
-    }
-    
-    // 简化格式（向后兼容）：{width: 1, color: 'red'}
-    if (value is Map<String, dynamic> && value.containsKey('width')) {
-      final borderColor = _parseColor(value['color']) ?? Colors.black;
-      final borderWidth = (value['width'] ?? 1.0).toDouble();
-      return Border.all(color: borderColor, width: borderWidth);
-    }
-    
-    return null;
-  }
-  
-  /// 解析单个BorderSide
-  BorderSide? _parseBorderSide(dynamic value) {
-    if (value == null) return null;
-    
-    if (value is Map<String, dynamic>) {
-      final color = _parseColor(value['color']) ?? Colors.black;
-      final width = (value['width'] ?? 1.0).toDouble();
-      final style = value['style'] ?? 'solid';
-      
-      if (style == 'none' || width == 0) {
-        return BorderSide.none;
-      }
-      
-      return BorderSide(
-        color: color,
-        width: width,
-        style: style == 'solid' ? BorderStyle.solid : BorderStyle.none,
-      );
-    }
-    
-    return null;
-  }
-  
-  /// 解析BoxDecoration
-  BoxDecoration _parseDecoration(Map<String, dynamic> decorationMap) {
-    Color? color;
-    Border? border;
-    BorderRadius? borderRadius;
-    List<BoxShadow>? boxShadow;
-    
-    // 解析颜色
-    if (decorationMap['color'] != null) {
-      color = _parseColor(decorationMap['color']);
-    }
-    
-    // 解析边框
-    if (decorationMap['border'] != null) {
-      border = _parseBorder(decorationMap['border']);
-    }
-    
-    // 解析圆角
-    if (decorationMap['borderRadius'] != null) {
-      borderRadius = _parseBorderRadius(decorationMap['borderRadius']);
-    }
-    
-    return BoxDecoration(
-      color: color,
-      border: border,
-      borderRadius: borderRadius,
-      boxShadow: boxShadow,
-    );
-  }
 }

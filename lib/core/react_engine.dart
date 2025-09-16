@@ -67,7 +67,6 @@ class ReactEngine {
       final result = _jsRuntime!.evaluate('FlutterReactCore.renderAgentComponent("CounterAgent", $propsJson)');
       
       final jsonString = result.rawResult.toString();
-      if (_kDebugMode) debugPrint('📥 渲染结果: $jsonString');
       
       // 解析JSON
       final json = VirtualDOMParser.parseFromJson(jsonString);
