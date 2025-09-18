@@ -43,12 +43,12 @@ class ReactEngine {
     }
   }
   
-  /// 渲染React组件
-  Future<Widget?> renderComponent(String componentName, {
+  
+  /// 获取增量更新指令
+  Future<List<dynamic>?> renderComponentIncremental(String componentName, {
     Map<String, dynamic>? props,
-    Function(String)? onEvent,
   }) async {
-    // Rendering component: $componentName
+    if (_kDebugMode) debugPrint('📝 获取增量更新: $componentName');
     
     if (!_initialized) {
       await initialize();
@@ -60,32 +60,30 @@ class ReactEngine {
     }
     
     try {
-      // 构建props
+      // 现在renderAgentComponent通过bridge发送指令，不返回JSON
       final propsJson = props != null ? _mapToJsObject(props) : '{}';
+      _jsRuntime!.evaluate('FlutterReactCore.renderAgentComponent("CounterAgent", $propsJson)');
       
-      // 调用渲染方法
-      final result = _jsRuntime!.evaluate('FlutterReactCore.renderAgentComponent("CounterAgent", $propsJson)');
-      
-      final jsonString = result.rawResult.toString();
-      
-      // 解析JSON
-      final json = VirtualDOMParser.parseFromJson(jsonString);
-      
-      // 设置事件回调
-      if (onEvent != null) {
-        ComponentRegistry.instance.setEventCallback(onEvent);
-      }
-      
-      // 构建Widget
-      return ComponentRegistry.instance.buildComponent(json);
+      if (_kDebugMode) debugPrint('📋 React组件已启动，指令将通过bridge发送');
+      return []; // 返回空数组，实际指令通过bridge发送
       
     } catch (e) {
-      _lastError = '渲染失败: $e';
+      _lastError = '启动React组件失败: $e';
       if (_kDebugMode) debugPrint('❌ $_lastError');
-      return _buildErrorWidget(_lastError);
+      return null;
     }
   }
   
+  /// 设置bridge消息监听
+  void setBridgeMessageListener(String messageType, Function(dynamic) callback) {
+    if (_jsRuntime != null) {
+      _jsRuntime!.onMessage(messageType, (dynamic args) {
+        callback(args);
+        return '';
+      });
+    }
+  }
+
   /// 加载js-core包
   Future<void> _loadJSCore() async {
     try {

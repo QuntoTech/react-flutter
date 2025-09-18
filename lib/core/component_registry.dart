@@ -91,6 +91,7 @@ class ComponentRegistry {
     }
   }
   
+  
   /// 构建未知组件的占位符
   Widget _buildUnknownComponent(VirtualDOM vdom) {
     return Container(

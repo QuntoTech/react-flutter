@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../core/react_engine.dart';
 import '../core/component_registry.dart';
 import '../core/agent_loader.dart';
+import '../core/widget_manager.dart';
+import '../core/virtual_dom_parser.dart';
 import '../components/widgets/text.dart';
 import '../components/widgets/column.dart';
 import '../components/widgets/row.dart';
@@ -61,6 +63,9 @@ class _DemoAppState extends State<DemoApp> {
         });
         return;
       }
+      
+      // 设置bridge监听，接收React的更新指令
+      ReactEngine.instance.setBridgeMessageListener('updateInstructions', _handleUpdateInstructions);
 
       setState(() {
         _status = '加载Counter Agent...';
@@ -110,34 +115,61 @@ class _DemoAppState extends State<DemoApp> {
   }
 
   Future<void> _renderAgentComponent() async {
-    // 使用AgentLoader渲染Counter Agent
-    final widget = await AgentLoader.instance.renderAgent(
-      'Counter Agent',
-      onEvent: _handleAgentEvent,
-    );
-
-    setState(() {
-      _reactWidget = widget;
-    });
+    try {
+      
+      // 设置事件回调
+      ComponentRegistry.instance.setEventCallback(_handleAgentEvent);
+      
+      // React会通过bridge发送所有Widget，这里不需要手动创建容器
+      
+      // Agent的index.js已经调用了render，这里什么都不需要做
+      
+      
+    } catch (e) {
+      debugPrint('启动React应用错误: $e');
+      setState(() {
+        _status = '启动错误: $e';
+        _isLoading = false;
+      });
+    }
   }
+  
 
   void _handleAgentEvent(String eventName) async {
     // debugPrint('处理Agent事件: $eventName');
     
-    // 只处理事件，不重新渲染（React会自动处理状态更新）
+    // 只处理事件，让React自己处理状态更新和通知
     await ReactEngine.instance.handleEvent(eventName);
-    
-    // 注意：不再重新创建Agent实例，React的持续根容器会自动处理状态更新
-    // 但我们仍然需要获取更新后的Widget树来更新Flutter UI
-    final updatedWidget = await AgentLoader.instance.renderAgent(
-      'Counter Agent',
-      onEvent: _handleAgentEvent,
-    );
-    
-    if (updatedWidget != null) {
-      setState(() {
-        _reactWidget = updatedWidget;
-      });
+  }
+  
+  void _handleUpdateInstructions(dynamic args) {
+    // React通过bridge发送的更新指令
+    try {
+      
+      List<dynamic> instructions;
+      
+      // 处理不同的数据类型
+      if (args is String) {
+        instructions = VirtualDOMParser.parseInstructionsFromJson(args);
+      } else if (args is List<dynamic>) {
+        instructions = args;
+      } else {
+        return;
+      }
+      
+      if (instructions.isNotEmpty) {
+        
+        // 使用WidgetManager应用更新指令
+        final updatedWidget = WidgetManager.instance.applyInstructions(instructions);
+        
+        if (updatedWidget != null) {
+          setState(() {
+            _reactWidget = updatedWidget;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('处理bridge更新指令错误: $e');
     }
   }
 

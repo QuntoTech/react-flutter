@@ -26,25 +26,20 @@ async function initialize(): Promise<boolean> {
   }
 }
 
+
 /**
- * 渲染Agent组件
+ * 渲染Agent组件 - 返回更新指令数组（默认模式）
  */
-function renderAgentComponent(agentName: string, props: any = {}): string {
+function renderAgentComponent(agentName: string, props: any = {}): void {
   try {
     const Component = AgentLoader.findAgentComponent(agentName);
     if (!Component) {
       throw new Error(`Agent component not found: ${agentName}`);
     }
     const element = React.createElement(Component, props);
-    const widget = FlutterRenderer.render(element);
-    return JSON.stringify(widget);
+    FlutterRenderer.render(element); // 现在通过bridge发送指令，不返回
   } catch (error: any) {
     console.error('Render error:', error.message);
-    return JSON.stringify({
-      type: 'Text',
-      props: { text: `Error: ${error.message}` },
-      children: []
-    });
   }
 }
 
@@ -55,18 +50,34 @@ function handleEvent(eventName: string, eventData: any = {}): void {
   executeFlutterEvent(eventName, eventData);
 }
 
+/**
+ * 渲染React组件到Flutter（类似react-dom的render）
+ */
+function render(element: React.ReactElement): void {
+  try {
+    FlutterRenderer.render(element);
+  } catch (error: any) {
+    console.error('Render error:', error.message);
+  }
+}
+
 // 创建全局对象
 const FlutterReactCore = {
   initialize,
-  renderAgentComponent,
+  render,            // 新的通用render方法
+  renderAgentComponent,  // 保留向后兼容
   handleEvent
 };
 
 // 确保全局导出
 (globalThis as any).FlutterReactCore = FlutterReactCore;
+(globalThis as any).FlutterRenderer = FlutterRenderer;
+(globalThis as any).AgentLoader = AgentLoader;
+(globalThis as any).React = React;
 
 export {
   initialize,
+  render,            // 导出render函数
   renderAgentComponent,
   handleEvent,
   processEventProps

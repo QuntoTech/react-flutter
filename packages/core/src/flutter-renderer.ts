@@ -1,6 +1,6 @@
 /**
  * Flutter Renderer - 干净的react-reconciler实现
- * 目标：渲染简单的Text组件
+ * 支持增量更新指令模式
  */
 
 // 为flutter_js环境提供缺失的API
@@ -54,20 +54,35 @@ interface FlutterWidget {
   type: string;
   props: Record<string, any>;
   children: FlutterWidget[];
+  _id?: string;
 }
 
 // Flutter实例类型
 interface FlutterInstance extends FlutterWidget {
-  _type: string;
+  _type: 'element';
+  _id?: string;
 }
 
 // Flutter文本实例
 interface FlutterTextInstance {
   type: 'Text';
-  props: { text: string };
+  props: { text: string; id?: string };
   children: [];
   _isText: true;
+  _id?: string;
 }
+
+// 更新指令类型定义
+type UpdateInstruction = 
+  | ['updateWidget', string, Record<string, any>]    // 更新Widget属性
+  | ['createWidget', string, string, Record<string, any>] // 创建Widget：ID，类型，属性
+  | ['appendChild', string, string, string, Record<string, any>] // 添加子Widget：父ID，子ID或NO_ID，子类型，子属性
+  | ['removeWidget', string]                        // 移除Widget
+  | (string | Record<string, any>)[];               // 通用指令数组
+
+// 全局状态管理
+let isCollectingUpdates = false;
+let updateInstructions: UpdateInstruction[] = [];
 
 /**
  * React Reconciler HostConfig
@@ -91,12 +106,31 @@ const FlutterHostConfig = {
     // 从props中移除children，避免重复和循环引用
     const { children, ...cleanProps } = props;
     
-    return {
+    // 如果没有显式ID，生成一个临时ID并添加到props中
+    if (!cleanProps.id) {
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      cleanProps.id = tempId;  // 将生成的ID添加到props中，保持稳定
+    }
+    
+    const instance: FlutterInstance = {
       type,
-      props: cleanProps,  // 不包含children的props
+      props: cleanProps,  // 现在包含稳定的ID
       children: [],       // 单独的children数组
-      _type: 'element'
+      _type: 'element',
+      _id: cleanProps.id as string  // 现在肯定有ID
     };
+    
+    // 只在增量更新模式下收集创建指令
+    if (isCollectingUpdates) {
+      updateInstructions.push([
+        'createWidget',
+        cleanProps.id,
+        type,
+        cleanProps
+      ]);
+    }
+    
+    return instance;
   },
   
   // 创建文本实例
@@ -106,17 +140,44 @@ const FlutterHostConfig = {
     hostContext: any,
     internalHandle: any
   ): FlutterTextInstance {
-    return {
+    // 为文本实例生成临时ID
+    const tempId = `temp-text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    const instance: FlutterTextInstance = {
       type: 'Text',
-      props: { text },
+      props: { text, id: tempId },  // 将生成的ID添加到props中
       children: [],
-      _isText: true
+      _isText: true,
+      _id: tempId  // 稳定的ID
     };
+    
+    // 只在增量更新模式下收集创建指令
+    if (isCollectingUpdates) {
+      updateInstructions.push([
+        'createWidget',
+        tempId,
+        'Text',
+        { text, id: tempId }
+      ]);
+    }
+    
+    return instance;
   },
-  
-  // 添加初始子元素
+
+  // 添加初始子元素 - 关键方法
   appendInitialChild(parent: FlutterInstance, child: FlutterInstance | FlutterTextInstance): void {
     parent.children.push(child);
+    
+    // 收集appendChild指令 - 所有组件现在都应该有ID
+    if (isCollectingUpdates && parent._id && child._id) {
+      updateInstructions.push([
+        'appendChild',
+        parent._id,
+        child._id,
+        child.type,
+        child.props
+      ]);
+    }
   },
   
   // 完成初始化
@@ -155,14 +216,12 @@ const FlutterHostConfig = {
     oldProps: Record<string, any>,
     newProps: Record<string, any>
   ): any {
-    // 使用高性能的浅比较检查props变化
     const hasChanges = !shallowEqual(oldProps, newProps);
     
     if (hasChanges) {
       return { oldProps, newProps };
     }
     
-    // 没有变化则返回null，React不会调用commitUpdate
     return null;
   },
   
@@ -174,11 +233,22 @@ const FlutterHostConfig = {
     newProps: Record<string, any>,
     internalHandle: any
   ): void {
+    
     // 更新实例的props
     const { children, ...cleanProps } = newProps;
     instance.props = cleanProps;
+    
+    // 自动启动收集模式（如果还没启动）
+    if (!isCollectingUpdates) {
+      isCollectingUpdates = true;
+      updateInstructions = [];
+    }
+    
+    // 收集更新指令
+    if (instance._id) {
+      updateInstructions.push(['updateWidget', instance._id, cleanProps]);
+    }
   },
-  
   
   // 提交文本更新
   commitTextUpdate(
@@ -191,7 +261,18 @@ const FlutterHostConfig = {
   
   // 重置提交后
   resetAfterCommit(containerInfo: any): void {
-    // UI更新完成
+    if (isCollectingUpdates) {
+      isCollectingUpdates = false;
+      
+      if (updateInstructions.length > 0) {
+        const flutter_js = (globalThis as any).sendMessage;
+        if (flutter_js) {
+          flutter_js('updateInstructions', JSON.stringify(updateInstructions));
+        }
+      }
+      
+      updateInstructions = [];
+    }
   },
   
   // 准备提交
@@ -202,6 +283,17 @@ const FlutterHostConfig = {
   // Mutation方法
   appendChild(parent: FlutterInstance, child: FlutterInstance | FlutterTextInstance): void {
     parent.children.push(child);
+    
+    // 收集appendChild指令
+    if (isCollectingUpdates && parent._id) {
+      updateInstructions.push([
+        'appendChild',
+        parent._id,
+        child._id || 'NO_ID',
+        child.type,
+        child.props
+      ]);
+    }
   },
   
   appendChildToContainer(container: any, child: FlutterInstance | FlutterTextInstance): void {
@@ -236,7 +328,6 @@ const FlutterHostConfig = {
   
   // 时间和调度 - 为flutter_js环境提供简单实现
   scheduleTimeout: (fn: Function, delay: number) => {
-    // flutter_js环境中的简单实现
     return setTimeout ? setTimeout(fn, delay) : 0;
   },
   cancelTimeout: (id: any) => {
@@ -332,13 +423,15 @@ const FlutterHostConfig = {
 };
 
 /**
- * Flutter渲染器 - 采用持续根容器模式
+ * Flutter渲染器 - 采用持续根容器模式 + 增量更新
  */
 export class FlutterRenderer {
   private static reconciler: any;
   private static initialized = false;
   private static container: { rootWidget: FlutterWidget | null } | null = null;
   private static fiberRoot: any = null;
+  
+  // 增量更新相关 - 已移动到全局变量
   
   /**
    * 初始化渲染器
@@ -386,26 +479,23 @@ export class FlutterRenderer {
   }
   
   /**
-   * 渲染React元素为Flutter Widget（类似root.render）
+   * 渲染React元素，返回更新指令数组
    */
-  static render(element: React.ReactElement): FlutterWidget {
+  static render(element: React.ReactElement): void {
     // 确保根容器存在
     if (!this.fiberRoot) {
       this.createRoot();
     }
     
-    // 更新现有的根容器（不重新创建）
+    // 清空上次的指令并启动收集模式
+    updateInstructions = [];
+    isCollectingUpdates = true;
+    
+    // 更新现有的根容器
     this.reconciler.updateContainer(element, this.fiberRoot, null);
     
-    // 同步刷新更新
+    // 同步刷新更新（这会触发resetAfterCommit并通过bridge发送指令）
     this.reconciler.flushSync();
-    
-    // 返回结果
-    return this.container?.rootWidget || {
-      type: 'Text',
-      props: { text: 'Empty' },
-      children: []
-    };
   }
   
   /**

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, ElevatedButton, Color } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -28,90 +28,21 @@ import {
   EllipsisText,
   SizedBoxDemoCard,
   FixedSizeBox,
-  SpacerBox,
-  ElevatedButtonDemoCard,
-  BasicElevatedButton,
-  StatefulElevatedButton,
-  LargeElevatedButton,
-  CircularElevatedButton
+  SpacerBox
 } from './styled';
+import CounterDemo from './CounterDemo';
 
-const ElevatedButtonDemoContainer = () => (
-  <ElevatedButtonDemoCard id="elevated-button-demo">
-    <Column crossAxisAlignment="start">
-      <Text text="ElevatedButton 按钮演示" style={{ fontSize: 16, color: Color.white, fontWeight: 'bold' }} />
-      
-      {/* 基础按钮 */}
-      <Column crossAxisAlignment="start">
-        <Text text="基础按钮" style={{ fontSize: 12, color: Color.white }} />
-        <BasicElevatedButton 
-          id="basic-elevated-button"
-          onPressed={() => console.log('基础按钮点击')}
-        >
-          <Text text="点击我" style={{ fontSize: 14, color: Color.white }} />
-        </BasicElevatedButton>
-      </Column>
-
-      <SizedBox height={16} />
-
-      {/* Material状态按钮 */}
-      <Column crossAxisAlignment="start">
-        <Text text="状态响应按钮" style={{ fontSize: 12, color: Color.white }} />
-        <Row>
-          <StatefulElevatedButton 
-            id="stateful-elevated-button"
-            onPressed={() => console.log('状态按钮点击')}
-          >
-            <Text text="交互状态" style={{ fontSize: 14, color: Color.white }} />
-          </StatefulElevatedButton>
-          
-          <SizedBox width={12} />
-          
-          <StatefulElevatedButton 
-            id="disabled-elevated-button"
-            onPressed={null}  // 禁用状态
-          >
-            <Text text="禁用状态" style={{ fontSize: 14, color: Color.fromRGBO(158, 158, 158, 1.0) }} />
-          </StatefulElevatedButton>
-        </Row>
-      </Column>
-
-      <SizedBox height={16} />
-
-      {/* 不同尺寸按钮 */}
-      <Column crossAxisAlignment="start">
-        <Text text="尺寸演示" style={{ fontSize: 12, color: Color.white }} />
-        <Row crossAxisAlignment="center">
-          <LargeElevatedButton 
-            id="large-elevated-button"
-            onPressed={() => console.log('大按钮点击')}
-          >
-            <Text text="大尺寸按钮" style={{ fontSize: 16, color: Color.white, fontWeight: 'bold' }} />
-          </LargeElevatedButton>
-          
-          <SizedBox width={16} />
-          
-          <CircularElevatedButton 
-            id="circular-elevated-button"
-            onPressed={() => console.log('圆形按钮点击')}
-          >
-            <Text text="+" style={{ fontSize: 24, color: Color.white, fontWeight: 'bold' }} />
-          </CircularElevatedButton>
-        </Row>
-      </Column>
-    </Column>
-  </ElevatedButtonDemoCard>
-);
 
 /**
  * Container组件功能展示
  * 演示Container组件的完整功能和API
  */
 const Counter = () => {
+
   // 展示基础样式：颜色+圆角+阴影+边框
   const BasicStyleContainer = () => (
     <BasicStyleCard id="basic-style-demo">
-      <Text text="基础样式：颜色+圆角+阴影+边框" fontSize={12} color={Color.white} />
+      <Text text={`基础样式：颜色+圆角+阴影+边框`} fontSize={12} color={Color.white} />
     </BasicStyleCard>
   );
 
@@ -324,7 +255,7 @@ const Counter = () => {
         <RowDemoContainer />
         <TextDemoContainer />
         <SizedBoxDemoContainer />
-        <ElevatedButtonDemoContainer />
+        <CounterDemo />
       </Column>
     </MainScrollView>
   );

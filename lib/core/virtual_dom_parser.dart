@@ -127,6 +127,20 @@ class VirtualDOMParser {
     }
   }
   
+  /// 从JSON字符串解析更新指令数组
+  static List<dynamic> parseInstructionsFromJson(String jsonString) {
+    try {
+      final json = jsonDecode(jsonString);
+      if (json is List) {
+        return json;
+      } else {
+        throw Exception('指令数据必须是数组格式');
+      }
+    } catch (e) {
+      throw Exception('解析更新指令失败: $e');
+    }
+  }
+  
   /// 从Map解析虚拟DOM
   static VirtualDOM parseFromMap(Map<String, dynamic> json) {
     return VirtualDOM.fromJson(json);

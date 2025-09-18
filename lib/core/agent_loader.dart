@@ -240,34 +240,24 @@ class AgentLoader {
     return true; // 暂时总是返回true
   }
   
-  /// 渲染Agent组件
-  Future<Widget?> renderAgent(String agentName, {
+  /// 获取增量更新指令
+  Future<List<dynamic>?> getIncrementalUpdates(String agentName, {
     Map<String, dynamic>? props,
-    Function(String)? onEvent,
   }) async {
-    if (_kDebugMode) debugPrint('🎯 renderAgent调用: $agentName');
+    if (_kDebugMode) debugPrint('📝 获取增量更新: $agentName');
     
     final agent = _loadedAgents[agentName];
     if (agent == null) {
       _lastError = 'Agent未找到: $agentName';
-      if (_kDebugMode) debugPrint('❌ Agent未找到: $agentName');
       return null;
     }
     
-    if (_kDebugMode) debugPrint('✅ 找到Agent: ${agent.name}');
-    if (_kDebugMode) debugPrint('📝 组件列表: ${agent.components.map((c) => c.name).toList()}');
-    
-    // 渲染Agent的主组件
     final mainComponent = agent.components.isNotEmpty ? 
       agent.components.first.name : 'Counter';
     
-    if (_kDebugMode) debugPrint('🎨 准备渲染组件: "$mainComponent"');
-    if (_kDebugMode) debugPrint('📊 传入props: $props');
-    
-    return await ReactEngine.instance.renderComponent(
+    return await ReactEngine.instance.renderComponentIncremental(
       mainComponent,
       props: props,
-      onEvent: onEvent,
     );
   }
   
