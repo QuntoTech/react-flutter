@@ -345,8 +345,8 @@ export const SpacerBox = styleSheet.Container({
 
 // ElevatedButton演示容器
 export const ElevatedButtonDemoCard = styleSheet.Container({
-  width: 320,
-  height: 280,
+  width: 400,
+  height: 320,
   padding: EdgeInsets.all(16),
   margin: EdgeInsets.all(10),
   decoration: {
@@ -396,8 +396,8 @@ export const StatefulElevatedButton = styleSheet.ElevatedButton({
 export const LargeElevatedButton = styleSheet.ElevatedButton({
   backgroundColor: Color.fromRGBO(255, 87, 34, 1.0),  // 橙色
   foregroundColor: Color.white,
-  minimumSize: { width: 200, height: 56 },
-  padding: EdgeInsets.symmetric({ horizontal: 32, vertical: 16 }),
+  minimumSize: { width: 180, height: 56 },
+  padding: EdgeInsets.symmetric({ horizontal: 24, vertical: 16 }),
   shape: {
     type: 'RoundedRectangleBorder',
     borderRadius: { topLeft: 28, topRight: 28, bottomRight: 28, bottomLeft: 28 }

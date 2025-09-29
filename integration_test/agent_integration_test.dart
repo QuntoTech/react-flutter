@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import '../lib/main.dart' as app;
+import '../lib/core/react_engine.dart';
+import '../lib/core/widget_manager.dart';
 
 /// 范围匹配器
 Matcher inRange(double min, double max) => _InRange(min, max);
@@ -37,6 +39,11 @@ Future<void> pumpUntilFound(
 
 /// 启动应用并等待就绪
 Future<void> launchAppAndWaitReady(WidgetTester tester) async {
+  print('🧹 清理系统状态...');
+  // 强制清理系统状态，确保测试间隔离
+  ReactEngine.instance.dispose();
+  WidgetManager.instance.clear();
+  
   print('📱 启动React-Flutter应用...');
   app.main();
   await tester.pumpAndSettle();

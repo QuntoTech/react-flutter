@@ -95,8 +95,8 @@ describe('StyleSheet', () => {
       
       expect(StyledContainer.isStyledComponent).toBe(true);
       expect(StyledContainer.baseStyles).toEqual(baseStyles);
-      expect(typeof StyledContainer.Component).toBe('object');
-      expect((StyledContainer.Component as any).$$typeof).toBe(Symbol.for('react.forward_ref'));
+      expect(typeof StyledContainer.Component).toBe('function');
+      expect((StyledContainer as any).$$typeof).toBe(Symbol.for('react.forward_ref'));
       expect(StyledContainer.displayName).toContain('Styled');
     });
   });
@@ -266,8 +266,8 @@ describe('StyleSheet', () => {
       expect(StyledContainer.isStyledComponent).toBe(true);
       expect(StyledContainer.baseStyles).toEqual(styles);
       expect(StyledContainer.displayName).toContain('Styled');
-      expect(typeof StyledContainer.Component).toBe('object');
-      expect((StyledContainer.Component as any).$$typeof).toBe(Symbol.for('react.forward_ref'));
+      expect(typeof StyledContainer.Component).toBe('function');
+      expect((StyledContainer as any).$$typeof).toBe(Symbol.for('react.forward_ref'));
     });
 
     /**
