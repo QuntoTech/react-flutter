@@ -845,5 +845,54 @@ void main() {
       expect(labeledImage.width, equals(100.0));
       expect(labeledImage.height, equals(100.0));
     });
+
+    /// GestureDetector组件功能测试
+    testWidgets('GestureDetector基础渲染测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final gestureAreaFinder = find.byKey(const Key('gesture-area'));
+      expect(gestureAreaFinder, findsOneWidget);
+      
+      final gestureDetector = tester.widget<GestureDetector>(gestureAreaFinder);
+      expect(gestureDetector.key, isA<Key>());
+      expect((gestureDetector.key as Key).toString(), contains('gesture-area'));
+      
+      // 验证子组件存在
+      final touchAreaFinder = find.byKey(const Key('touch-area'));
+      expect(touchAreaFinder, findsOneWidget);
+    });
+
+    testWidgets('GestureDetector手势状态文本测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 验证手势状态文本存在
+      final gestureStatusFinder = find.byKey(const Key('gesture-status'));
+      expect(gestureStatusFinder, findsOneWidget);
+      
+      final gestureStatusText = tester.widget<Text>(gestureStatusFinder);
+      expect(gestureStatusText.data, contains('手势:'));
+      
+      // 验证点击次数文本存在
+      final tapCountFinder = find.byKey(const Key('tap-count'));
+      expect(tapCountFinder, findsOneWidget);
+      
+      final tapCountText = tester.widget<Text>(tapCountFinder);
+      expect(tapCountText.data, contains('点击次数:'));
+    });
+
+    testWidgets('GestureDetector事件回调注册测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final gestureAreaFinder = find.byKey(const Key('gesture-area'));
+      final gestureDetector = tester.widget<GestureDetector>(gestureAreaFinder);
+      
+      // 验证手势回调已注册
+      expect(gestureDetector.onTap, isNotNull, reason: 'onTap应该已注册');
+      expect(gestureDetector.onDoubleTap, isNotNull, reason: 'onDoubleTap应该已注册');
+      expect(gestureDetector.onLongPress, isNotNull, reason: 'onLongPress应该已注册');
+      expect(gestureDetector.onPanStart, isNotNull, reason: 'onPanStart应该已注册');
+      expect(gestureDetector.onPanUpdate, isNotNull, reason: 'onPanUpdate应该已注册');
+      expect(gestureDetector.onPanEnd, isNotNull, reason: 'onPanEnd应该已注册');
+    });
   });
 }

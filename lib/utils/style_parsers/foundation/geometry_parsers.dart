@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
 import 'primitive_parsers.dart';
 
 /// 几何类型解析器
@@ -349,5 +351,33 @@ class GradientParsers {
   /// 解析数值 - 委托给PrimitiveParsers
   static double _parseNumber(dynamic value, double defaultValue) {
     return PrimitiveParsers.parseNumber(value, defaultValue);
+  }
+
+  /// 解析HitTestBehavior命中测试行为
+  static HitTestBehavior? parseHitTestBehavior(String? value) {
+    if (value == null) return null;
+    switch (value) {
+      case 'deferToChild':
+        return HitTestBehavior.deferToChild;
+      case 'opaque':
+        return HitTestBehavior.opaque;
+      case 'translucent':
+        return HitTestBehavior.translucent;
+      default:
+        return null;
+    }
+  }
+
+  /// 解析DragStartBehavior拖拽开始行为
+  static DragStartBehavior? parseDragStartBehavior(String? value) {
+    if (value == null) return null;
+    switch (value) {
+      case 'down':
+        return DragStartBehavior.down;
+      case 'start':
+        return DragStartBehavior.start;
+      default:
+        return null;
+    }
   }
 }

@@ -12,7 +12,7 @@ class ComponentRegistry {
   static ComponentRegistry get instance => _instance;
   
   final Map<String, FlutterComponent> _components = {};
-  Function(String)? _eventCallback;
+  Function(String, Map<String, dynamic>?)? _eventCallback;
   
   /// 注册组件
   void register(FlutterComponent component) {
@@ -78,14 +78,16 @@ class ComponentRegistry {
   }
   
   /// 设置事件回调
-  void setEventCallback(Function(String)? callback) {
+  void setEventCallback(Function(String, Map<String, dynamic>?)? callback) {
     _eventCallback = callback;
   }
   
   /// 触发事件
-  void triggerEvent(String eventName) {
+  /// eventName: 事件名称
+  /// eventData: 事件数据（可选），如手势详情、触摸位置等
+  void triggerEvent(String eventName, [Map<String, dynamic>? eventData]) {
     if (_eventCallback != null) {
-      _eventCallback!(eventName);
+      _eventCallback!(eventName, eventData);
     } else {
       // debugPrint('事件触发但无回调: $eventName');
     }

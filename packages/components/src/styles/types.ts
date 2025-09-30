@@ -340,6 +340,175 @@ export type BlendModeValue =
 export type BoxShapeValue = 'rectangle' | 'circle';
 
 // =============================================================================
+// GestureDetector手势类型
+// =============================================================================
+
+/**
+ * 手势位置信息 (对齐Flutter Offset)
+ */
+export interface OffsetValue {
+  dx: number;
+  dy: number;
+}
+
+/**
+ * 手势速度信息 (对齐Flutter Velocity)
+ */
+export interface VelocityValue {
+  pixelsPerSecond: OffsetValue;
+}
+
+/**
+ * Tap按下详情 (对齐Flutter TapDownDetails)
+ */
+export interface TapDownDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  kind?: PointerDeviceKindValue;
+}
+
+/**
+ * Tap抬起详情 (对齐Flutter TapUpDetails)
+ */
+export interface TapUpDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  kind?: PointerDeviceKindValue;
+}
+
+/**
+ * Drag开始详情 (对齐Flutter DragStartDetails)
+ */
+export interface DragStartDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  sourceTimeStamp?: number;
+  kind?: PointerDeviceKindValue;
+}
+
+/**
+ * Drag更新详情 (对齐Flutter DragUpdateDetails)
+ */
+export interface DragUpdateDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  delta: OffsetValue;
+  primaryDelta?: number;
+  sourceTimeStamp?: number;
+}
+
+/**
+ * Drag结束详情 (对齐Flutter DragEndDetails)
+ */
+export interface DragEndDetails {
+  velocity: VelocityValue;
+  primaryVelocity?: number;
+}
+
+/**
+ * Drag按下详情 (对齐Flutter DragDownDetails)
+ */
+export interface DragDownDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+}
+
+/**
+ * Scale开始详情 (对齐Flutter ScaleStartDetails)
+ */
+export interface ScaleStartDetails {
+  focalPoint: OffsetValue;
+  localFocalPoint: OffsetValue;
+  pointerCount?: number;
+}
+
+/**
+ * Scale更新详情 (对齐Flutter ScaleUpdateDetails)
+ */
+export interface ScaleUpdateDetails {
+  focalPoint: OffsetValue;
+  localFocalPoint: OffsetValue;
+  focalPointDelta: OffsetValue;
+  scale: number;
+  horizontalScale: number;
+  verticalScale: number;
+  rotation: number;
+  pointerCount?: number;
+  sourceTimeStamp?: number;
+}
+
+/**
+ * Scale结束详情 (对齐Flutter ScaleEndDetails)
+ */
+export interface ScaleEndDetails {
+  velocity: VelocityValue;
+  pointerCount?: number;
+}
+
+/**
+ * LongPress开始详情 (对齐Flutter LongPressStartDetails)
+ */
+export interface LongPressStartDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+}
+
+/**
+ * LongPress移动更新详情 (对齐Flutter LongPressMoveUpdateDetails)
+ */
+export interface LongPressMoveUpdateDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  offsetFromOrigin: OffsetValue;
+  localOffsetFromOrigin: OffsetValue;
+}
+
+/**
+ * LongPress结束详情 (对齐Flutter LongPressEndDetails)
+ */
+export interface LongPressEndDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  velocity: VelocityValue;
+}
+
+/**
+ * ForcePress详情 (对齐Flutter ForcePressDetails)
+ * 用于3D Touch / Haptic Touch
+ */
+export interface ForcePressDetails {
+  globalPosition: OffsetValue;
+  localPosition: OffsetValue;
+  pressure: number;
+}
+
+/**
+ * 指针设备类型 (对齐Flutter PointerDeviceKind)
+ */
+export type PointerDeviceKindValue = 
+  | 'touch'      // 触摸屏
+  | 'mouse'      // 鼠标
+  | 'stylus'     // 触控笔
+  | 'invertedStylus' // 反转触控笔（橡皮擦端）
+  | 'trackpad'   // 触控板
+  | 'unknown';   // 未知设备
+
+/**
+ * 命中测试行为 (对齐Flutter HitTestBehavior)
+ */
+export type HitTestBehaviorValue =
+  | 'deferToChild'   // 只有子组件可以接收事件
+  | 'opaque'         // 组件本身和子组件都可以接收事件，阻止事件穿透
+  | 'translucent';   // 组件本身和子组件都可以接收事件，允许事件穿透
+
+/**
+ * 拖拽开始行为 (对齐Flutter DragStartBehavior)
+ */
+export type DragStartBehaviorValue =
+  | 'down'   // 在按下时立即开始拖拽
+  | 'start'; // 在移动超过阈值后开始拖拽
+
+// =============================================================================
 // StyleSheet相关类型
 // =============================================================================
 

@@ -3,6 +3,7 @@ export * from './column';
 export * from './container';
 export * from './elevated-button';
 export * from './expanded';
+export * from './gesture-detector';
 export * from './icon';
 export * from './image';
 export * from './padding';

@@ -483,3 +483,25 @@ export const ImageDemoCard = styleSheet.Container({
     borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
   }
 });
+
+// GestureDetector Demo卡片
+export const GestureDemoCard = styleSheet.Container({
+  width: 360,
+  height: 600,
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(33, 150, 243, 1.0),  // 蓝色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});
+
+// 手势交互区域
+export const GestureArea = styleSheet.Container({
+  width: 150,
+  height: 150,
+  decoration: {
+    color: Color.fromRGBO(255, 255, 255, 0.9),
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});

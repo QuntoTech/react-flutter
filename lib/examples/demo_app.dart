@@ -19,6 +19,7 @@ import '../components/widgets/center.dart';
 import '../components/widgets/padding.dart';
 import '../components/widgets/icon.dart';
 import '../components/widgets/image.dart';
+import '../components/widgets/gesture_detector.dart';
 
 /// 演示应用
 /// 展示新架构的React+Flutter渲染功能
@@ -62,6 +63,7 @@ class _DemoAppState extends State<DemoApp> {
       PaddingComponent(),
       IconComponent(),
       ImageComponent(),
+      GestureDetectorComponent(),
     ]);
 
       setState(() {
@@ -148,12 +150,12 @@ class _DemoAppState extends State<DemoApp> {
     }
   }
   
-
-  void _handleAgentEvent(String eventName) async {
-    // debugPrint('处理Agent事件: $eventName');
+  
+  void _handleAgentEvent(String eventName, Map<String, dynamic>? eventData) async {
+    // debugPrint('处理Agent事件: $eventName, 数据: $eventData');
     
-    // 只处理事件，让React自己处理状态更新和通知
-    await ReactEngine.instance.handleEvent(eventName);
+    // 处理事件并传递事件数据
+    await ReactEngine.instance.handleEvent(eventName, eventData: eventData);
   }
   
   void _handleUpdateInstructions(dynamic args) {

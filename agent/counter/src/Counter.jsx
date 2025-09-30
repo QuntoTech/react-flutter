@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center, Padding, EdgeInsets, Icon, Image } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center, Padding, EdgeInsets, Icon, Image, GestureDetector } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -33,6 +33,8 @@ import {
   PaddingDemoCard,
   IconDemoCard,
   ImageDemoCard,
+  GestureDemoCard,
+  GestureArea,
   FixedSizeBox,
   SpacerBox
 } from './styled';
@@ -880,6 +882,85 @@ const ImageDemoContainer = () => (
   </ImageDemoCard>
 );
 
+// GestureDetector手势检测演示容器
+const GestureDetectorDemoContainer = () => {
+  const [tapCount, setTapCount] = React.useState(0);
+  const [lastGesture, setLastGesture] = React.useState('等待手势...');
+
+  const handleTap = () => {
+    setTapCount(c => c + 1);
+    setLastGesture('单击');
+  };
+
+  const handleDoubleTap = () => {
+    setLastGesture('双击');
+  };
+
+  const handleLongPress = () => {
+    setLastGesture('长按');
+  };
+
+  const handlePanStart = () => {
+    setLastGesture('拖拽开始');
+  };
+
+  const handlePanUpdate = () => {
+    setLastGesture('拖拽中...');
+  };
+
+  const handlePanEnd = () => {
+    setLastGesture('拖拽结束');
+  };
+
+  return (
+    <GestureDemoCard id="gesture-demo-card">
+      <Column crossAxisAlignment="center">
+        <Text text="GestureDetector手势演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+        
+        <SizedBox height={20} />
+        
+        {/* 手势状态显示 */}
+        <Text text={`手势: ${lastGesture}`} style={{ fontSize: 14, color: Color.white }} id="gesture-status" />
+        <Text text={`点击次数: ${tapCount}`} style={{ fontSize: 14, color: Color.white }} id="tap-count" />
+        
+        <SizedBox height={20} />
+        
+        {/* 手势交互区域 */}
+        <GestureDetector
+          id="gesture-area"
+          onTap={handleTap}
+          onDoubleTap={handleDoubleTap}
+          onLongPress={handleLongPress}
+          onPanStart={handlePanStart}
+          onPanUpdate={handlePanUpdate}
+          onPanEnd={handlePanEnd}
+        >
+          <GestureArea id="touch-area">
+            <Center>
+              <Text 
+                text="触摸这里" 
+                style={{ fontSize: 18, fontWeight: 'bold', color: Color.fromRGBO(33, 150, 243, 1.0) }} 
+              />
+            </Center>
+          </GestureArea>
+        </GestureDetector>
+        
+        <SizedBox height={20} />
+        
+        {/* 使用说明 */}
+        <Column crossAxisAlignment="start">
+          <Text text="支持的手势:" style={{ fontSize: 12, fontWeight: 'bold', color: Color.white }} />
+          <SizedBox height={4} />
+          <Text text="• 单击 - 快速点击一次" style={{ fontSize: 11, color: Color.fromRGBO(255, 255, 255, 0.9) }} />
+          <Text text="• 双击 - 快速点击两次" style={{ fontSize: 11, color: Color.fromRGBO(255, 255, 255, 0.9) }} />
+          <Text text="• 长按 - 按住不放" style={{ fontSize: 11, color: Color.fromRGBO(255, 255, 255, 0.9) }} />
+          <Text text="• 拖拽 - 按住并移动" style={{ fontSize: 11, color: Color.fromRGBO(255, 255, 255, 0.9) }} />
+        </Column>
+      </Column>
+    </GestureDemoCard>
+  );
+};
+
   return (
     <MainScrollView 
       id="main-scroll-view"
@@ -906,6 +987,7 @@ const ImageDemoContainer = () => (
         <PaddingDemoContainer />
         <IconDemoContainer />
         <ImageDemoContainer />
+        <GestureDetectorDemoContainer />
         <CounterDemo />
       </Column>
     </MainScrollView>
