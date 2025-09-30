@@ -329,6 +329,14 @@ export type BoxFitValue = 'fill' | 'contain' | 'cover' | 'fitWidth' | 'fitHeight
 
 export type ImageRepeatValue = 'repeat' | 'repeatX' | 'repeatY' | 'noRepeat';
 
+export type BlendModeValue = 
+  | 'clear' | 'src' | 'dst' | 'srcOver' | 'dstOver' | 'srcIn' | 'dstIn' 
+  | 'srcOut' | 'dstOut' | 'srcATop' | 'dstATop' | 'xor' | 'plus' 
+  | 'modulate' | 'screen' | 'overlay' | 'darken' | 'lighten' 
+  | 'colorDodge' | 'colorBurn' | 'hardLight' | 'softLight' 
+  | 'difference' | 'exclusion' | 'multiply' | 'hue' | 'saturation' 
+  | 'color' | 'luminosity';
+
 export type BoxShapeValue = 'rectangle' | 'circle';
 
 // =============================================================================

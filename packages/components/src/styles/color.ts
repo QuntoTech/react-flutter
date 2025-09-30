@@ -123,6 +123,14 @@ export class Color {
     return this.value === other.value;
   }
 
+  /**
+   * toJSON方法，用于JSON序列化
+   * 确保Color对象通过bridge传递时正确序列化为{value: number}格式
+   */
+  toJSON(): { value: number } {
+    return { value: this._value };
+  }
+
   // =============================================================================
   // 预定义颜色常量 - 对齐Flutter Colors类
   // =============================================================================

@@ -17,6 +17,8 @@ import '../components/widgets/positioned.dart';
 import '../components/widgets/expanded.dart';
 import '../components/widgets/center.dart';
 import '../components/widgets/padding.dart';
+import '../components/widgets/icon.dart';
+import '../components/widgets/image.dart';
 
 /// 演示应用
 /// 展示新架构的React+Flutter渲染功能
@@ -58,6 +60,8 @@ class _DemoAppState extends State<DemoApp> {
       ExpandedComponent(),
       CenterComponent(),
       PaddingComponent(),
+      IconComponent(),
+      ImageComponent(),
     ]);
 
       setState(() {

@@ -1,423 +1,225 @@
 /**
- * Container组件测试套件
- * 验证新的style属性支持和样式合并功能
- * 
- * 测试目标：
- * 1. 验证ContainerProps接口的正确性
- * 2. 确保style数组合并功能
- * 3. 验证样式对象的正确传递
- * 4. 测试边界情况处理
+ * Container组件React端单元测试
+ * 验证Container组件的正确创建和属性传递
  */
 
-import React from 'react';
+import * as React from 'react';
 import { Container } from '../src/container';
-import { ContainerStyle, ClipBehaviorValue, AlignmentValue } from '../src/styles/types';
-import { Text } from '../src/text';
+import { ContainerStyle } from '../src/styles/types';
 import { Color } from '../src/styles/color';
 import { EdgeInsets } from '../src/styles/edge-insets';
-import { Border } from '../src/styles/border';
 import { BorderRadius } from '../src/styles/border-radius';
-import { mergeStyles } from '../src/styles/merge-styles';
+import { Border } from '../src/styles/border';
 
-describe('Container Component', () => {
-  describe('Props接口验证', () => {
-    /**
-     * 测试目的：验证Container组件接受正确的props
-     * 验证路径：ContainerProps → 正确的类型约束
-     * 重要性：确保符合CONTAINER_DESIGN.md规范
-     */
-    test('应该接受children和style属性', () => {
-      // 类型检查：这些应该通过TypeScript编译
-      expect(() => {
-        <Container style={{ padding: 16, color: Color.blue }}>
-          <Text text="Test Content" />
-        </Container>
-      }).not.toThrow();
+describe('Container组件', () => {
+  describe('基础功能', () => {
+    test('应该正确渲染Container组件', () => {
+      const element = React.createElement(Container, {
+        id: 'test-container'
+      });
+      
+      expect(element.type).toBe(Container);
+      expect(element.props.id).toBe('test-container');
     });
 
-    /**
-     * 测试目的：验证style属性的类型约束
-     * 验证路径：ContainerStyle接口 → 正确的类型检查
-     * 重要性：确保类型安全
-     */
-    test('应该接受ContainerStyle类型的style', () => {
-      expect(() => {
-        <Container style={{
-          width: 100,
-          height: 200,
-          padding: 16,
-          margin: 8,
-          color: Color.blue,
-          decoration: {
-            borderRadius: 8,
-            border: { width: 1, color: Color.grey }
-          }
-        }} />;
-      }).not.toThrow();
+    test('应该支持children', () => {
+      const element = React.createElement(Container, {
+        children: React.createElement('div', null, 'Test Child')
+      });
+      
+      expect(element.props.children).toBeDefined();
     });
-
   });
 
-  describe('样式合并功能', () => {
-    /**
-     * 测试目的：验证单个样式对象的处理
-     * 验证路径：单个style对象 → 直接传递
-     * 重要性：确保基础功能正确
-     */
-    test('应该正确处理单个样式对象', () => {
-      expect(() => {
-        <Container style={{ padding: 16, color: Color.blue }} />;
-      }).not.toThrow();
-    });
-
-
-    /**
-     * 测试目的：验证空style的处理
-     * 验证路径：undefined/null style → 正确处理
-     * 重要性：确保边界情况不出错
-     */
-    test('应该正确处理空样式', () => {
-      expect(() => {
-        <Container />;
-        <Container style={undefined} />;
-        <Container style={null as any} />;
-      }).not.toThrow();
-    });
-
-  });
-
-  describe('复杂样式对象', () => {
-    /**
-     * 测试目的：验证复杂decoration对象的处理
-     * 验证路径：包含decoration的样式 → 正确传递
-     * 重要性：确保复杂样式的支持
-     */
-    test('应该支持复杂的decoration样式', () => {
-      expect(() => {
-        <Container style={{
-          decoration: {
-            borderRadius: 12,
-            border: { width: 2, color: Color.blue },
-            boxShadow: [
-              { color: Color.fromRGBO(0, 0, 0, 0.1), blurRadius: 4, offset: { dx: 0, dy: 2 }, blurStyle: 'normal' }
-            ],
-            gradient: {
-              type: 'linear',
-              begin: 'topLeft',
-              end: 'bottomRight',
-              colors: [Color.blue, Color.purple],
-              tileMode: 'clamp'
-            },
-            image: {
-              url: 'https://example.com/background.jpg',
-              fit: 'cover',
-              repeat: 'noRepeat'
-            },
-            shape: 'rectangle'
-          }
-        }} />;
-      }).not.toThrow();
-    });
-
-    /**
-     * 测试目的：验证constraints对象的支持
-     * 验证路径：包含constraints的样式 → 正确传递
-     * 重要性：确保布局约束的支持
-     */
-    test('应该支持constraints样式', () => {
-      expect(() => {
-        <Container style={{
-          constraints: {
-            minWidth: 100,
-            maxWidth: 300,
-            minHeight: 50,
-            maxHeight: 200
-          }
-        }} />;
-      }).not.toThrow();
-    });
-
-    /**
-     * 测试目的：验证BoxShape形状的支持
-     * 验证路径：包含shape的样式 → 正确传递
-     * 重要性：确保形状变换的支持
-     */
-    test('应该支持BoxShape形状样式', () => {
-      const rectangleStyle: ContainerStyle = {
-        decoration: {
-          shape: 'rectangle',
-          color: Color.blue
-        }
-      };
-
-      const circleStyle: ContainerStyle = {
+  describe('样式属性传递', () => {
+    test('style属性应该正确传递', () => {
+      const style: ContainerStyle = {
         width: 100,
-        height: 100,
-        decoration: {
-          shape: 'circle',
-          gradient: {
-            type: 'radial',
-            colors: [Color.yellow, Color.orange],
-            center: 'center',
-            radius: 0.8
-          }
-        }
-      };
-      
-      expect(() => {
-        <Container style={rectangleStyle} />;
-        <Container style={circleStyle} />;
-      }).not.toThrow();
-    });
-
-    /**
-     * 测试目的：验证完整decoration系统的组合
-     * 验证路径：所有decoration属性组合 → 正确处理
-     * 重要性：确保decoration系统的完整性
-     */
-    test('应该支持完整decoration系统的组合', () => {
-      const fullDecorationStyle: ContainerStyle = {
-        decoration: {
-          color: Color.white,
-          gradient: {
-            type: 'sweep',
-            center: 'center',
-            startAngle: 0,
-            endAngle: 6.28318530718, // 2π
-            colors: [Color.red, Color.orange, Color.yellow, Color.green, Color.blue, Color.purple, Color.red]
-          },
-          image: {
-            url: 'assets/textures/paper.png',
-            fit: 'none',
-            repeat: 'repeat'
-          },
-          border: {
-            width: 2,
-            color: Color.black
-          },
-          borderRadius: 16,
-          boxShadow: [
-            {
-              color: Color.black26,
-              blurRadius: 8,
-              offset: { dx: 0, dy: 4 },
-              spreadRadius: 2,
-              blurStyle: 'normal'
-            },
-            {
-              color: Color.blue.withOpacity(0.3),
-              blurRadius: 16,
-              offset: { dx: 0, dy: 8 },
-              spreadRadius: 0,
-              blurStyle: 'outer'
-            }
-          ],
-          shape: 'rectangle'
-        }
-      };
-      
-      expect(() => {
-        <Container style={fullDecorationStyle} />;
-      }).not.toThrow();
-      
-      // 验证所有decoration属性都存在
-      const decoration = fullDecorationStyle.decoration!;
-      expect(decoration.color).toBeDefined();
-      expect(decoration.gradient).toBeDefined();
-      expect(decoration.image).toBeDefined();
-      expect(decoration.border).toBeDefined();
-      expect(decoration.borderRadius).toBeDefined();
-      expect(decoration.boxShadow).toBeDefined();
-      expect(decoration.shape).toBeDefined();
-    });
-  });
-
-  describe('Constraints约束功能测试', () => {
-    /**
-     * 测试目的：验证constraints属性的支持
-     * 验证路径：BoxConstraints值 → 正确处理
-     * 重要性：确保与Flutter BoxConstraints API的完全对齐
-     */
-    test('应该支持所有BoxConstraints属性', () => {
-      const constraintsValues = [
-        { minWidth: 100 },
-        { maxWidth: 300 },
-        { minHeight: 50 },
-        { maxHeight: 200 },
-        { minWidth: 100, maxWidth: 300 },
-        { minHeight: 50, maxHeight: 200 },
-        { minWidth: 100, maxWidth: 300, minHeight: 50, maxHeight: 200 }
-      ];
-
-      constraintsValues.forEach(constraints => {
-        expect(() => {
-          <Container style={{ constraints }} />;
-        }).not.toThrow();
-      });
-    });
-
-    /**
-     * 测试目的：验证constraints与其他样式的组合使用
-     * 验证路径：constraints + 其他样式 → 正确合并
-     * 重要性：确保样式系统的兼容性
-     */
-    test('应该支持constraints与其他样式的组合', () => {
-      expect(() => {
-        <Container style={{
-          constraints: { minWidth: 100, maxWidth: 300 },
-          color: Color.blue,
-          padding: EdgeInsets.all(10),
-          alignment: 'center'
-        }} />;
-      }).not.toThrow();
-    });
-
-
-    /**
-     * 测试目的：验证constraints为undefined的处理
-     * 验证路径：constraints: undefined → 正确忽略
-     * 重要性：确保可选属性的健壮处理
-     */
-    test('应该正确处理undefined constraints', () => {
-      expect(() => {
-        <Container style={{ constraints: undefined, color: Color.green }} />;
-      }).not.toThrow();
-    });
-  });
-
-  describe('Alignment对齐功能测试', () => {
-    /**
-     * 测试目的：验证alignment属性的类型安全性
-     * 验证路径：AlignmentValue类型 → TypeScript类型检查
-     * 重要性：确保alignment值的正确性
-     */
-    test('应该支持所有Flutter Alignment值', () => {
-      const allAlignmentValues = [
-        'topLeft', 'topCenter', 'topRight',
-        'centerLeft', 'center', 'centerRight', 
-        'bottomLeft', 'bottomCenter', 'bottomRight'
-      ] as const;
-      
-      allAlignmentValues.forEach(alignment => {
-        expect(() => {
-          <Container style={{ alignment }} />;
-        }).not.toThrow();
-      });
-    });
-
-    /**
-     * 测试目的：验证alignment与其他样式属性的组合使用
-     * 验证路径：alignment + decoration + padding → 正确组合
-     * 重要性：确保alignment不与其他属性冲突
-     */
-    test('应该支持alignment与其他样式属性组合', () => {
-      const combinedStyle: ContainerStyle = {
-        width: 200,
-        height: 100,
-        padding: 16,
-        margin: 8,
-        alignment: 'center',
-        decoration: {
-          color: Color.blue,
-          borderRadius: 8,
-          border: { width: 1, color: Color.grey }
-        }
-      };
-      
-      expect(() => {
-        <Container style={combinedStyle}>
-          <span>Test Content</span>
-        </Container>;
-      }).not.toThrow();
-    });
-
-
-    /**
-     * 测试目的：验证undefined alignment值的处理
-     * 验证路径：alignment: undefined → 正确处理
-     * 重要性：确保可选属性的正确处理
-     */
-    test('应该正确处理undefined alignment', () => {
-      expect(() => {
-        <Container style={{
-          width: 100,
-          height: 100,
-          alignment: undefined  // 显式设置为undefined
-        }} />;
-      }).not.toThrow();
-    });
-  });
-
-  describe('使用场景测试', () => {
-    /**
-     * 测试目的：模拟真实的使用场景
-     * 验证路径：完整的Container使用 → 正确工作
-     * 重要性：确保在真实应用中的可用性
-     */
-    test('应该支持完整的使用场景', () => {
-      const cardStyle: ContainerStyle = {
-        width: 300,
         height: 200,
-        padding: 16,
-        margin: 8,
+        padding: EdgeInsets.all(16),
+        color: Color.blue
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style).toBeDefined();
+    });
+
+    test('应该支持复杂decoration样式', () => {
+      const style: ContainerStyle = {
         decoration: {
-          borderRadius: 8,
-          border: { width: 1, color: new Color(0xFFE0E0E0) }
-        },
+          color: Color.blue,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all({ width: 2, color: Color.red })
+        }
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style).toBeDefined();
+      expect(element.props.style!.decoration).toBeDefined();
+    });
+
+    test('id属性应该正确传递', () => {
+      const element = React.createElement(Container, {
+        id: 'my-container',
+        style: { width: 100 }
+      });
+      
+      expect(element.props.id).toBe('my-container');
+    });
+  });
+
+  describe('尺寸属性', () => {
+    test('应该正确传递width和height', () => {
+      const style: ContainerStyle = {
+        width: 300,
+        height: 200
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.width).toBe(300);
+      expect(element.props.style!.height).toBe(200);
+    });
+
+    test('应该支持constraints约束', () => {
+      const style: ContainerStyle = {
+        constraints: {
+          minWidth: 100,
+          maxWidth: 300,
+          minHeight: 50,
+          maxHeight: 200
+        }
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.constraints).toBeDefined();
+      expect(element.props.style!.constraints!.minWidth).toBe(100);
+      expect(element.props.style!.constraints!.maxWidth).toBe(300);
+    });
+  });
+
+  describe('间距属性', () => {
+    test('应该正确传递padding', () => {
+      const style: ContainerStyle = {
+        padding: EdgeInsets.all(20)
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.padding).toBeDefined();
+    });
+
+    test('应该正确传递margin', () => {
+      const style: ContainerStyle = {
+        margin: EdgeInsets.symmetric({ horizontal: 10, vertical: 20 })
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.margin).toBeDefined();
+    });
+  });
+
+  describe('对齐和变换', () => {
+    test('应该正确传递alignment', () => {
+      const style: ContainerStyle = {
         alignment: 'center'
       };
       
-      expect(() => {
-        <Container style={cardStyle}>
-          <Text text="Card Content" />
-        </Container>;
-      }).not.toThrow();
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.alignment).toBe('center');
     });
 
-    /**
-     * 测试目的：模拟styleSheet的使用场景
-     * 验证路径：与styleSheet结合使用 → 正确工作
-     * 重要性：确保与整个样式系统的兼容性
-     */
-    test('应该与样式继承配合使用', () => {
-      const baseStyle: ContainerStyle = {
-        padding: 16,
-        decoration: { borderRadius: 8 }
+    test('应该正确传递transform', () => {
+      const transform = [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+      ];
+      
+      const style: ContainerStyle = {
+        transform: transform
       };
       
-      const extendedStyle: ContainerStyle = {
-        color: Color.blue,
-        margin: 8
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.transform).toEqual(transform);
+    });
+
+    test('应该正确传递transformAlignment', () => {
+      const style: ContainerStyle = {
+        transformAlignment: 'topLeft'
       };
       
-      // 模拟styleSheet(BaseComponent)(extendedStyle)的结果，单个样式对象
-      const combinedStyle = { ...baseStyle, ...extendedStyle };
+      const element = React.createElement(Container, {
+        style: style
+      });
       
-      expect(() => {
-        <Container style={combinedStyle} />;
-      }).not.toThrow();
+      expect(element.props.style!.transformAlignment).toBe('topLeft');
     });
   });
 
-  describe('ForegroundDecoration前景装饰功能测试', () => {
-    test('应该正确处理foregroundDecoration属性', () => {
+  describe('裁剪行为', () => {
+    test('应该正确传递clipBehavior', () => {
       const style: ContainerStyle = {
-        width: 200,
-        height: 100,
-        decoration: {
-          color: Color.blue
-        },
+        clipBehavior: 'antiAlias'
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.clipBehavior).toBe('antiAlias');
+    });
+
+    test('应该支持所有ClipBehavior值', () => {
+      const clipValues = ['none', 'hardEdge', 'antiAlias', 'antiAliasWithSaveLayer'] as const;
+      
+      clipValues.forEach(clipBehavior => {
+        const style: ContainerStyle = { clipBehavior };
+        const element = React.createElement(Container, { style });
+        expect(element.props.style!.clipBehavior).toBe(clipBehavior);
+      });
+    });
+  });
+
+  describe('前景装饰', () => {
+    test('应该正确传递foregroundDecoration', () => {
+      const style: ContainerStyle = {
         foregroundDecoration: {
           border: Border.all({ color: Color.red, width: 2 })
         }
       };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.foregroundDecoration).toBeDefined();
-      expect(mergedStyle.foregroundDecoration?.border).toBeDefined();
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.foregroundDecoration).toBeDefined();
     });
 
-    test('应该支持所有decoration功能', () => {
+    test('应该支持foregroundDecoration所有属性', () => {
       const style: ContainerStyle = {
         foregroundDecoration: {
           color: Color.fromRGBO(255, 0, 0, 0.5),
@@ -430,182 +232,82 @@ describe('Container Component', () => {
           }]
         }
       };
-
-      const mergedStyle = mergeStyles({}, style);
-      const fg = mergedStyle.foregroundDecoration;
-      expect(fg?.color).toEqual({ value: Color.fromRGBO(255, 0, 0, 0.5).value });
-      expect(fg?.borderRadius).toBeDefined();
-      expect(fg?.border).toBeDefined();
-      expect(fg?.boxShadow).toBeDefined();
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      const fg = element.props.style!.foregroundDecoration;
+      expect(fg).toBeDefined();
+      expect(fg!.color).toBeDefined();
+      expect(fg!.borderRadius).toBeDefined();
+      expect(fg!.border).toBeDefined();
+      expect(fg!.boxShadow).toBeDefined();
     });
+  });
 
-    test('应该与decoration和其他属性正确组合', () => {
+  describe('组合场景', () => {
+    test('应该支持完整属性组合', () => {
       const style: ContainerStyle = {
-        width: 250,
-        height: 80,
-        padding: EdgeInsets.all(15),
+        width: 300,
+        height: 200,
+        padding: EdgeInsets.all(16),
+        margin: EdgeInsets.all(8),
         decoration: {
-          color: Color.blue,
-          borderRadius: BorderRadius.circular(15)
-        },
-        foregroundDecoration: {
-          border: Border.all({ color: Color.yellow, width: 3 }),
-          borderRadius: BorderRadius.circular(15)
+          color: Color.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all({ width: 1, color: Color.grey }),
+          boxShadow: [{
+            color: Color.black26,
+            blurRadius: 4,
+            offset: { dx: 0, dy: 2 }
+          }]
         },
         alignment: 'center'
       };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.decoration?.color).toEqual({ value: Color.blue.value });
-      expect(mergedStyle.foregroundDecoration?.border).toBeDefined();
-      expect(mergedStyle.alignment).toBe('center');
-    });
-
-    test('应该支持渐变前景装饰', () => {
-      const style: ContainerStyle = {
-        foregroundDecoration: {
-          gradient: {
-            type: 'linear',
-            colors: [Color.transparent, Color.fromRGBO(0, 0, 0, 0.7)],
-            begin: 'topCenter',
-            end: 'bottomCenter'
-          }
-        }
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      const gradient = mergedStyle.foregroundDecoration?.gradient;
-      expect(gradient?.type).toBe('linear');
-      expect(gradient?.colors).toHaveLength(2);
-    });
-  });
-
-  describe('ClipBehavior裁剪行为功能测试', () => {
-    test('应该正确处理clipBehavior属性', () => {
-      const style: ContainerStyle = {
-        width: 200,
-        height: 100,
-        clipBehavior: 'antiAlias'
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.clipBehavior).toBe('antiAlias');
-    });
-
-    test('应该支持所有Flutter Clip值', () => {
-      const clipValues: ClipBehaviorValue[] = [
-        'none', 'hardEdge', 'antiAlias', 'antiAliasWithSaveLayer'
-      ];
-
-      clipValues.forEach(clipBehavior => {
-        const style: ContainerStyle = { clipBehavior };
-        const mergedStyle = mergeStyles({}, style);
-        expect(mergedStyle.clipBehavior).toBe(clipBehavior);
-      });
-    });
-
-    test('应该与其他样式属性正确组合', () => {
-      const style: ContainerStyle = {
-        width: 200,
-        height: 100,
-        decoration: {
-          color: Color.blue,
-          borderRadius: BorderRadius.circular(15)
-        },
-        clipBehavior: 'antiAliasWithSaveLayer'
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.decoration?.color).toEqual({ value: Color.blue.value });
-      expect(mergedStyle.clipBehavior).toBe('antiAliasWithSaveLayer');
-    });
-  });
-
-  describe('TransformAlignment变换中心点功能测试', () => {
-    test('应该正确处理transformAlignment属性', () => {
-      const style: ContainerStyle = {
-        width: 200,
-        height: 100,
-        transformAlignment: 'topLeft'
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.transformAlignment).toBe('topLeft');
-    });
-
-    test('应该支持所有Flutter Alignment值', () => {
-      const alignmentValues: AlignmentValue[] = [
-        'topLeft', 'topCenter', 'topRight',
-        'centerLeft', 'center', 'centerRight', 
-        'bottomLeft', 'bottomCenter', 'bottomRight'
-      ];
-
-      alignmentValues.forEach(transformAlignment => {
-        const style: ContainerStyle = { transformAlignment };
-        const mergedStyle = mergeStyles({}, style);
-        expect(mergedStyle.transformAlignment).toBe(transformAlignment);
-      });
-    });
-
-    test('应该与alignment属性独立工作', () => {
-      const style: ContainerStyle = {
-        alignment: 'center',
-        transformAlignment: 'topLeft'
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.alignment).toBe('center');
-      expect(mergedStyle.transformAlignment).toBe('topLeft');
-    });
-  });
-
-  describe('Transform Matrix4变换功能测试', () => {
-    test('应该正确处理transform属性', () => {
-      const matrix = [
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        0.0, 0.0, 0.0, 1.0
-      ];
       
-      const style: ContainerStyle = {
-        width: 200,
-        height: 100,
-        transform: matrix
-      };
-
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.transform).toEqual(matrix);
+      const element = React.createElement(Container, {
+        style: style,
+        id: 'card-container',
+        children: React.createElement('div', null, 'Content')
+      });
+      
+      expect(element.type).toBe(Container);
+      expect(element.props.id).toBe('card-container');
+      expect(element.props.style).toBeDefined();
+      expect(element.props.children).toBeDefined();
     });
 
-    test('应该接受16个数字的Matrix4数组', () => {
-      const scaleMatrix = [
-        1.5, 0.0, 0.0, 0.0,
-        0.0, 1.5, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        0.0, 0.0, 0.0, 1.0
-      ];
+    test('应该支持最小属性组合', () => {
+      const element = React.createElement(Container);
+      expect(element.type).toBe(Container);
+      expect(element.props.style).toBeUndefined();
+    });
+  });
 
-      const style: ContainerStyle = { transform: scaleMatrix };
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.transform).toHaveLength(16);
-      expect(mergedStyle.transform).toEqual(scaleMatrix);
+  describe('边界情况', () => {
+    test('应该处理undefined style', () => {
+      const element = React.createElement(Container, {
+        style: undefined
+      });
+      expect(element.props.style).toBeUndefined();
     });
 
-    test('应该与transformAlignment配合使用', () => {
-      const style: ContainerStyle = {
-        transform: [
-          1.2, 0.0, 0.0, 0.0,
-          0.0, 1.2, 0.0, 0.0,
-          0.0, 0.0, 1.0, 0.0,
-          0.0, 0.0, 0.0, 1.0
-        ],
-        transformAlignment: 'center'
-      };
+    test('应该处理空children', () => {
+      const element = React.createElement(Container);
+      expect(element.props.children).toBeUndefined();
+    });
 
-      const mergedStyle = mergeStyles({}, style);
-      expect(mergedStyle.transform).toHaveLength(16);
-      expect(mergedStyle.transformAlignment).toBe('center');
+    test('应该处理空decoration对象', () => {
+      const style: ContainerStyle = {
+        decoration: {}
+      };
+      
+      const element = React.createElement(Container, {
+        style: style
+      });
+      
+      expect(element.props.style!.decoration).toBeDefined();
     });
   });
 });

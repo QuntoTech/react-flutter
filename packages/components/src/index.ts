@@ -3,6 +3,8 @@ export * from './column';
 export * from './container';
 export * from './elevated-button';
 export * from './expanded';
+export * from './icon';
+export * from './image';
 export * from './padding';
 export * from './positioned';
 export * from './single-child-scroll-view';

@@ -646,5 +646,204 @@ void main() {
       expect(innerEdgeInsets.right, equals(8.0));
       expect(innerEdgeInsets.bottom, equals(8.0));
     });
+
+    /// Icon组件功能测试
+    testWidgets('Icon基础图标测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 验证基础图标
+      final favoriteFinder = find.byKey(const Key('icon-favorite'));
+      final homeFinder = find.byKey(const Key('icon-home'));
+      final settingsFinder = find.byKey(const Key('icon-settings'));
+      final searchFinder = find.byKey(const Key('icon-search'));
+      
+      expect(favoriteFinder, findsOneWidget);
+      expect(homeFinder, findsOneWidget);
+      expect(settingsFinder, findsOneWidget);
+      expect(searchFinder, findsOneWidget);
+      
+      // 验证Icon属性
+      final favoriteIcon = tester.widget<Icon>(favoriteFinder);
+      expect(favoriteIcon.key, isA<Key>());
+      expect((favoriteIcon.key as Key).toString(), contains('icon-favorite'));
+      expect(favoriteIcon.icon, isA<IconData>());
+    });
+
+    testWidgets('Icon自定义大小测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final add24Finder = find.byKey(const Key('icon-add-24'));
+      final delete32Finder = find.byKey(const Key('icon-delete-32'));
+      final edit40Finder = find.byKey(const Key('icon-edit-40'));
+      
+      expect(add24Finder, findsOneWidget);
+      expect(delete32Finder, findsOneWidget);
+      expect(edit40Finder, findsOneWidget);
+      
+      final add24Icon = tester.widget<Icon>(add24Finder);
+      final delete32Icon = tester.widget<Icon>(delete32Finder);
+      final edit40Icon = tester.widget<Icon>(edit40Finder);
+      
+      expect(add24Icon.size, equals(24.0));
+      expect(delete32Icon.size, equals(32.0));
+      expect(edit40Icon.size, equals(40.0));
+    });
+
+    testWidgets('Icon自定义颜色测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final checkRedFinder = find.byKey(const Key('icon-check-red'));
+      final closeBlueFinder = find.byKey(const Key('icon-close-blue'));
+      final starYellowFinder = find.byKey(const Key('icon-star-yellow'));
+      
+      expect(checkRedFinder, findsOneWidget);
+      expect(closeBlueFinder, findsOneWidget);
+      expect(starYellowFinder, findsOneWidget);
+      
+      final checkRedIcon = tester.widget<Icon>(checkRedFinder);
+      final closeBlueIcon = tester.widget<Icon>(closeBlueFinder);
+      final starYellowIcon = tester.widget<Icon>(starYellowFinder);
+      
+      // 验证颜色
+      expect(checkRedIcon.color, equals(const Color(0xFFF44336))); // Red
+      expect(closeBlueIcon.color, equals(const Color(0xFF2196F3))); // Blue
+      expect(starYellowIcon.color, equals(const Color(0xFFFFEB3B))); // Yellow
+    });
+
+    testWidgets('Icon大图标测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final largeFinder = find.byKey(const Key('icon-favorite-large'));
+      expect(largeFinder, findsOneWidget);
+      
+      final largeIcon = tester.widget<Icon>(largeFinder);
+      expect(largeIcon.size, equals(64.0));
+      expect(largeIcon.color, equals(const Color(0xFFFF5722))); // Orange
+    });
+
+    testWidgets('Icon图标+文本组合测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final homeWithLabelFinder = find.byKey(const Key('icon-home-with-label'));
+      final settingsWithLabelFinder = find.byKey(const Key('icon-settings-with-label'));
+      final searchWithLabelFinder = find.byKey(const Key('icon-search-with-label'));
+      
+      expect(homeWithLabelFinder, findsOneWidget);
+      expect(settingsWithLabelFinder, findsOneWidget);
+      expect(searchWithLabelFinder, findsOneWidget);
+      
+      final homeIcon = tester.widget<Icon>(homeWithLabelFinder);
+      final settingsIcon = tester.widget<Icon>(settingsWithLabelFinder);
+      final searchIcon = tester.widget<Icon>(searchWithLabelFinder);
+      
+      expect(homeIcon.size, equals(28.0));
+      expect(settingsIcon.size, equals(28.0));
+      expect(searchIcon.size, equals(28.0));
+    });
+
+    testWidgets('Icon语义标签测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final addWithLabelFinder = find.byKey(const Key('icon-add-with-label'));
+      final deleteWithLabelFinder = find.byKey(const Key('icon-delete-with-label'));
+      final editWithLabelFinder = find.byKey(const Key('icon-edit-with-label'));
+      
+      expect(addWithLabelFinder, findsOneWidget);
+      expect(deleteWithLabelFinder, findsOneWidget);
+      expect(editWithLabelFinder, findsOneWidget);
+      
+      final addIcon = tester.widget<Icon>(addWithLabelFinder);
+      final deleteIcon = tester.widget<Icon>(deleteWithLabelFinder);
+      final editIcon = tester.widget<Icon>(editWithLabelFinder);
+      
+      expect(addIcon.semanticLabel, equals('添加项目'));
+      expect(deleteIcon.semanticLabel, equals('删除项目'));
+      expect(editIcon.semanticLabel, equals('编辑项目'));
+    });
+
+    /// Image组件功能测试
+    testWidgets('Image网络图片测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final networkImageFinder = find.byKey(const Key('network-image'));
+      expect(networkImageFinder, findsOneWidget);
+      
+      final networkImage = tester.widget<Image>(networkImageFinder);
+      expect(networkImage.key, isA<Key>());
+      expect((networkImage.key as Key).toString(), contains('network-image'));
+      expect(networkImage.width, equals(300.0));
+      expect(networkImage.height, equals(200.0));
+    });
+
+    testWidgets('Image BoxFit适应方式测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final coverFinder = find.byKey(const Key('image-cover'));
+      final containFinder = find.byKey(const Key('image-contain'));
+      final fillFinder = find.byKey(const Key('image-fill'));
+      
+      expect(coverFinder, findsOneWidget);
+      expect(containFinder, findsOneWidget);
+      expect(fillFinder, findsOneWidget);
+      
+      final coverImage = tester.widget<Image>(coverFinder);
+      final containImage = tester.widget<Image>(containFinder);
+      final fillImage = tester.widget<Image>(fillFinder);
+      
+      expect(coverImage.fit, equals(BoxFit.cover));
+      expect(containImage.fit, equals(BoxFit.contain));
+      expect(fillImage.fit, equals(BoxFit.fill));
+      
+      expect(coverImage.width, equals(80.0));
+      expect(coverImage.height, equals(80.0));
+    });
+
+    testWidgets('Image颜色混合模式测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final redFinder = find.byKey(const Key('image-color-red'));
+      final blueFinder = find.byKey(const Key('image-color-blue'));
+      final greenFinder = find.byKey(const Key('image-color-green'));
+      
+      expect(redFinder, findsOneWidget);
+      expect(blueFinder, findsOneWidget);
+      expect(greenFinder, findsOneWidget);
+      
+      final redImage = tester.widget<Image>(redFinder);
+      final blueImage = tester.widget<Image>(blueFinder);
+      final greenImage = tester.widget<Image>(greenFinder);
+      
+      expect(redImage.color, isNotNull);
+      expect(blueImage.color, isNotNull);
+      expect(greenImage.color, isNotNull);
+      expect(redImage.colorBlendMode, equals(BlendMode.modulate));
+      expect(blueImage.colorBlendMode, equals(BlendMode.modulate));
+      expect(greenImage.colorBlendMode, equals(BlendMode.modulate));
+    });
+
+    testWidgets('Image对齐方式测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final alignedFinder = find.byKey(const Key('image-aligned'));
+      expect(alignedFinder, findsOneWidget);
+      
+      final alignedImage = tester.widget<Image>(alignedFinder);
+      expect(alignedImage.alignment, equals(Alignment.centerRight));
+      expect(alignedImage.fit, equals(BoxFit.none));
+      expect(alignedImage.width, equals(300.0));
+      expect(alignedImage.height, equals(150.0));
+    });
+
+    testWidgets('Image语义标签测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final labeledFinder = find.byKey(const Key('image-with-label'));
+      expect(labeledFinder, findsOneWidget);
+      
+      final labeledImage = tester.widget<Image>(labeledFinder);
+      expect(labeledImage.semanticLabel, equals('随机风景图片'));
+      expect(labeledImage.width, equals(100.0));
+      expect(labeledImage.height, equals(100.0));
+    });
   });
 }

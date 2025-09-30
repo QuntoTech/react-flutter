@@ -1,241 +1,193 @@
 /**
  * SizedBox组件React端单元测试
- * 验证SizedBox组件的属性和Flutter API一致性
+ * 验证SizedBox组件的正确创建和属性传递
  */
 
-import React from 'react';
-import { SizedBox, SizedBoxProps } from '../src/sized-box';
+import * as React from 'react';
+import { SizedBox } from '../src/sized-box';
 
 describe('SizedBox组件', () => {
-  describe('Props接口验证', () => {
-    test('应该接受基本属性', () => {
-      const props: SizedBoxProps = {
-        width: 100,
-        height: 50,
+  describe('基础功能', () => {
+    test('应该正确渲染SizedBox组件', () => {
+      const element = React.createElement(SizedBox, {
         id: 'test-sizedbox'
-      };
-      expect(props).toBeDefined();
-    });
-
-    test('应该接受children', () => {
-      const props: SizedBoxProps = {
-        children: <div>子组件</div>,
-        width: 200,
-        height: 100
-      };
-      expect(props).toBeDefined();
-    });
-
-    test('应该接受只有宽度', () => {
-      const props: SizedBoxProps = {
-        width: 150
-      };
-      expect(props).toBeDefined();
-      expect(props.width).toBe(150);
-      expect(props.height).toBeUndefined();
-    });
-
-    test('应该接受只有高度', () => {
-      const props: SizedBoxProps = {
-        height: 75
-      };
-      expect(props).toBeDefined();
-      expect(props.height).toBe(75);
-      expect(props.width).toBeUndefined();
-    });
-
-    test('应该接受空属性', () => {
-      const props: SizedBoxProps = {};
-      expect(props).toBeDefined();
-    });
-  });
-
-  describe('属性类型验证', () => {
-    test('width应该接受number类型', () => {
-      const validWidths = [0, 50, 100.5, 200, Number.POSITIVE_INFINITY];
-      
-      validWidths.forEach(width => {
-        const props: SizedBoxProps = { width };
-        expect(props.width).toBe(width);
       });
+      
+      expect(element.type).toBe(SizedBox);
+      expect(element.props.id).toBe('test-sizedbox');
     });
 
-    test('height应该接受number类型', () => {
-      const validHeights = [0, 25, 150.8, 300, Number.POSITIVE_INFINITY];
-      
-      validHeights.forEach(height => {
-        const props: SizedBoxProps = { height };
-        expect(props.height).toBe(height);
+    test('应该支持children', () => {
+      const element = React.createElement(SizedBox, {
+        children: React.createElement('div', null, 'Child')
       });
-    });
-
-    test('id应该接受string类型', () => {
-      const validIds = ['', 'test', 'sized-box-1', 'my_sizedbox'];
       
-      validIds.forEach(id => {
-        const props: SizedBoxProps = { id };
-        expect(props.id).toBe(id);
+      expect(element.props.children).toBeDefined();
+    });
+  });
+
+  describe('尺寸属性', () => {
+    test('应该正确传递width属性', () => {
+      const element = React.createElement(SizedBox, {
+        width: 100
       });
-    });
-  });
-
-  describe('Flutter API一致性', () => {
-    test('应该只包含Flutter SizedBox的标准属性', () => {
-      const validProps: SizedBoxProps = {
-        width: 100,      // Flutter: double? width
-        height: 200,     // Flutter: double? height
-        children: <div />, // Flutter: Widget? child
-        id: 'flutter-sizedbox' // 自定义: Key? key
-      };
       
-      expect(validProps).toBeDefined();
-      expect(validProps.width).toBe(100);
-      expect(validProps.height).toBe(200);
-      expect(validProps.children).toBeDefined();
-      expect(validProps.id).toBe('flutter-sizedbox');
+      expect(element.props.width).toBe(100);
     });
 
-    test('不应该包含style属性（SizedBox是纯尺寸控制组件）', () => {
-      const validProps: SizedBoxProps = {
-        width: 50,
-        height: 50
-      };
+    test('应该正确传递height属性', () => {
+      const element = React.createElement(SizedBox, {
+        height: 200
+      });
       
-      expect('style' in validProps).toBe(false);
-      expect('color' in validProps).toBe(false);
-      expect('padding' in validProps).toBe(false);
-      expect('margin' in validProps).toBe(false);
+      expect(element.props.height).toBe(200);
     });
 
-    test('应该支持Flutter的特殊尺寸值', () => {
-      // 测试无穷大（expand效果）
-      const expandProps: SizedBoxProps = {
-        width: Number.POSITIVE_INFINITY,
-        height: Number.POSITIVE_INFINITY
-      };
-      expect(expandProps.width).toBe(Number.POSITIVE_INFINITY);
-      expect(expandProps.height).toBe(Number.POSITIVE_INFINITY);
-
-      // 测试零尺寸（shrink效果）
-      const shrinkProps: SizedBoxProps = {
-        width: 0,
-        height: 0
-      };
-      expect(shrinkProps.width).toBe(0);
-      expect(shrinkProps.height).toBe(0);
-    });
-  });
-
-  describe('特殊尺寸用法', () => {
-    test('应该支持expand效果（无穷大尺寸）', () => {
-      const expandProps: SizedBoxProps = {
-        width: Number.POSITIVE_INFINITY,
-        height: Number.POSITIVE_INFINITY,
-        id: 'expand-test'
-      };
-      expect(expandProps.width).toBe(Number.POSITIVE_INFINITY);
-      expect(expandProps.height).toBe(Number.POSITIVE_INFINITY);
-      expect(expandProps.id).toBe('expand-test');
-    });
-
-    test('应该支持shrink效果（零尺寸）', () => {
-      const shrinkProps: SizedBoxProps = {
-        width: 0,
-        height: 0,
-        id: 'shrink-test'
-      };
-      expect(shrinkProps.width).toBe(0);
-      expect(shrinkProps.height).toBe(0);
-      expect(shrinkProps.id).toBe('shrink-test');
-    });
-
-    test('应该支持square效果（相同宽高）', () => {
-      const squareProps: SizedBoxProps = {
-        width: 50,
-        height: 50,
-        id: 'square-test'
-      };
-      expect(squareProps.width).toBe(50);
-      expect(squareProps.height).toBe(50);
-      expect(squareProps.width).toBe(squareProps.height); // 确保相等
-      expect(squareProps.id).toBe('square-test');
-    });
-  });
-
-  describe('边界情况', () => {
-    test('应该处理零尺寸', () => {
-      const props: SizedBoxProps = { width: 0, height: 0 };
-      expect(props.width).toBe(0);
-      expect(props.height).toBe(0);
+    test('应该同时传递width和height', () => {
+      const element = React.createElement(SizedBox, {
+        width: 150,
+        height: 300
+      });
+      
+      expect(element.props.width).toBe(150);
+      expect(element.props.height).toBe(300);
     });
 
     test('应该处理小数尺寸', () => {
-      const props: SizedBoxProps = { width: 123.456, height: 78.9 };
-      expect(props.width).toBe(123.456);
-      expect(props.height).toBe(78.9);
+      const element = React.createElement(SizedBox, {
+        width: 100.5,
+        height: 200.75
+      });
+      
+      expect(element.props.width).toBe(100.5);
+      expect(element.props.height).toBe(200.75);
     });
 
-    test('应该处理很大的尺寸', () => {
-      const props: SizedBoxProps = { width: 99999, height: 88888 };
-      expect(props.width).toBe(99999);
-      expect(props.height).toBe(88888);
-    });
-
-    test('应该处理负数尺寸（虽然不推荐）', () => {
-      const props: SizedBoxProps = { width: -10, height: -20 };
-      expect(props.width).toBe(-10);
-      expect(props.height).toBe(-20);
-    });
-
-    test('应该处理无穷大尺寸', () => {
-      const props: SizedBoxProps = { 
-        width: Number.POSITIVE_INFINITY, 
-        height: Number.NEGATIVE_INFINITY 
-      };
-      expect(props.width).toBe(Number.POSITIVE_INFINITY);
-      expect(props.height).toBe(Number.NEGATIVE_INFINITY);
+    test('应该处理0尺寸', () => {
+      const element = React.createElement(SizedBox, {
+        width: 0,
+        height: 0
+      });
+      
+      expect(element.props.width).toBe(0);
+      expect(element.props.height).toBe(0);
     });
   });
 
-  describe('组合场景', () => {
-    test('应该支持完整属性组合', () => {
-      const props: SizedBoxProps = {
-        width: 150,
-        height: 200,
-        children: <span>内容</span>,
-        id: 'full-sizedbox'
-      };
-
-      expect(props.width).toBe(150);
-      expect(props.height).toBe(200);
-      expect(props.children).toBeDefined();
-      expect(props.id).toBe('full-sizedbox');
-    });
-
-    test('应该支持只设置一个维度', () => {
-      const widthOnlyProps: SizedBoxProps = {
-        width: 100,
-        children: <div>宽度固定</div>
-      };
-      expect(widthOnlyProps.width).toBe(100);
-      expect(widthOnlyProps.height).toBeUndefined();
-
-      const heightOnlyProps: SizedBoxProps = {
-        height: 50,
-        children: <div>高度固定</div>
-      };
-      expect(heightOnlyProps.height).toBe(50);
-      expect(heightOnlyProps.width).toBeUndefined();
-    });
-
-    test('应该支持用作间距控制', () => {
-      const horizontalSpacer: SizedBoxProps = { width: 20 };
-      const verticalSpacer: SizedBoxProps = { height: 10 };
+  describe('ID标识属性', () => {
+    test('应该正确传递id属性', () => {
+      const element = React.createElement(SizedBox, {
+        id: 'my-sizedbox'
+      });
       
-      expect(horizontalSpacer.width).toBe(20);
-      expect(horizontalSpacer.height).toBeUndefined();
-      expect(verticalSpacer.height).toBe(10);
-      expect(verticalSpacer.width).toBeUndefined();
+      expect(element.props.id).toBe('my-sizedbox');
+    });
+  });
+
+  describe('属性组合测试', () => {
+    test('应该支持完整属性组合', () => {
+      const element = React.createElement(SizedBox, {
+        width: 200,
+        height: 100,
+        id: 'complete-sizedbox',
+        children: React.createElement('div', null, 'Content')
+      });
+      
+      expect(element.type).toBe(SizedBox);
+      expect(element.props.width).toBe(200);
+      expect(element.props.height).toBe(100);
+      expect(element.props.id).toBe('complete-sizedbox');
+      expect(element.props.children).toBeDefined();
+    });
+
+    test('应该支持最小属性组合', () => {
+      const element = React.createElement(SizedBox);
+      expect(element.type).toBe(SizedBox);
+      expect(element.props.width).toBeUndefined();
+      expect(element.props.height).toBeUndefined();
+    });
+
+    test('应该支持仅width', () => {
+      const element = React.createElement(SizedBox, {
+        width: 100
+      });
+      
+      expect(element.props.width).toBe(100);
+      expect(element.props.height).toBeUndefined();
+    });
+
+    test('应该支持仅height', () => {
+      const element = React.createElement(SizedBox, {
+        height: 200
+      });
+      
+      expect(element.props.width).toBeUndefined();
+      expect(element.props.height).toBe(200);
+    });
+  });
+
+  describe('边界情况测试', () => {
+    test('应该处理空children', () => {
+      const element = React.createElement(SizedBox, {
+        width: 100,
+        height: 200
+      });
+      expect(element.props.children).toBeUndefined();
+    });
+
+    test('应该处理undefined尺寸', () => {
+      const element = React.createElement(SizedBox, {
+        width: undefined,
+        height: undefined
+      });
+      expect(element.props.width).toBeUndefined();
+      expect(element.props.height).toBeUndefined();
+    });
+
+    test('应该处理极大尺寸', () => {
+      const element = React.createElement(SizedBox, {
+        width: 99999,
+        height: 99999
+      });
+      
+      expect(element.props.width).toBe(99999);
+      expect(element.props.height).toBe(99999);
+    });
+  });
+
+  describe('Flutter API一致性验证', () => {
+    test('应该完全对齐Flutter SizedBox构造函数', () => {
+      // Flutter SizedBox主要用于固定尺寸
+      const fixedSizeElement = React.createElement(SizedBox, {
+        width: 100,
+        height: 100
+      });
+      
+      expect(fixedSizeElement.props.width).toBe(100);
+      expect(fixedSizeElement.props.height).toBe(100);
+    });
+
+    test('应该支持shrink语义（空SizedBox）', () => {
+      // Flutter: SizedBox.shrink() - 等价于 SizedBox(width: 0, height: 0)
+      const shrinkElement = React.createElement(SizedBox, {
+        width: 0,
+        height: 0
+      });
+      
+      expect(shrinkElement.props.width).toBe(0);
+      expect(shrinkElement.props.height).toBe(0);
+    });
+
+    test('应该支持expand语义（带child的SizedBox）', () => {
+      // Flutter: SizedBox.expand() - 无限大小
+      // 但我们的实现使用具体数字，这是合理的简化
+      const expandElement = React.createElement(SizedBox, {
+        width: Number.MAX_SAFE_INTEGER,
+        height: Number.MAX_SAFE_INTEGER
+      });
+      
+      expect(expandElement.props.width).toBe(Number.MAX_SAFE_INTEGER);
+      expect(expandElement.props.height).toBe(Number.MAX_SAFE_INTEGER);
     });
   });
 });

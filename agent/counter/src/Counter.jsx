@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center, Padding, EdgeInsets } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center, Padding, EdgeInsets, Icon, Image } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -31,6 +31,8 @@ import {
   ExpandedDemoCard,
   CenterDemoCard,
   PaddingDemoCard,
+  IconDemoCard,
+  ImageDemoCard,
   FixedSizeBox,
   SpacerBox
 } from './styled';
@@ -670,6 +672,214 @@ const PaddingDemoContainer = () => (
   </PaddingDemoCard>
 );
 
+// Icon图标演示组件
+const IconDemoContainer = () => (
+  <IconDemoCard>
+    <Column crossAxisAlignment="start">
+      <Text text="Icon图标演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+      
+      {/* 1. 基础图标 - 默认大小 */}
+      <SizedBox height={8} />
+      <Text text="1. 基础图标（默认大小）" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Icon.Favorite id="icon-favorite" color={Color.white} />
+        <Icon.Home id="icon-home" color={Color.white} />
+        <Icon.Settings id="icon-settings" color={Color.white} />
+        <Icon.Search id="icon-search" color={Color.white} />
+      </Row>
+      
+      {/* 2. 自定义大小 */}
+      <SizedBox height={12} />
+      <Text text="2. 自定义大小" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Icon.Add id="icon-add-24" size={24} color={Color.white} />
+        <Icon.Delete id="icon-delete-32" size={32} color={Color.white} />
+        <Icon.Edit id="icon-edit-40" size={40} color={Color.white} />
+      </Row>
+      
+      {/* 3. 自定义颜色 */}
+      <SizedBox height={12} />
+      <Text text="3. 自定义颜色" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Icon.Check id="icon-check-red" size={32} color={Color.fromRGBO(244, 67, 54, 1.0)} />
+        <Icon.Close id="icon-close-blue" size={32} color={Color.fromRGBO(33, 150, 243, 1.0)} />
+        <Icon.Star id="icon-star-yellow" size={32} color={Color.fromRGBO(255, 235, 59, 1.0)} />
+      </Row>
+      
+      {/* 4. 大图标 */}
+      <SizedBox height={12} />
+      <Text text="4. 大图标展示" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Center>
+        <Icon.Favorite id="icon-favorite-large" size={64} color={Color.fromRGBO(255, 87, 34, 1.0)} />
+      </Center>
+      
+      {/* 5. 图标+文本组合 */}
+      <SizedBox height={12} />
+      <Text text="5. 图标+文本组合" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Column crossAxisAlignment="center">
+          <Icon.Home id="icon-home-with-label" size={28} color={Color.white} />
+          <SizedBox height={4} />
+          <Text text="首页" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Icon.Settings id="icon-settings-with-label" size={28} color={Color.white} />
+          <SizedBox height={4} />
+          <Text text="设置" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Icon.Search id="icon-search-with-label" size={28} color={Color.white} />
+          <SizedBox height={4} />
+          <Text text="搜索" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+      </Row>
+      
+      {/* 6. 语义标签 */}
+      <SizedBox height={12} />
+      <Text text="6. 带语义标签（无障碍）" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Icon.Add id="icon-add-with-label" size={32} color={Color.white} semanticLabel="添加项目" />
+        <Icon.Delete id="icon-delete-with-label" size={32} color={Color.white} semanticLabel="删除项目" />
+        <Icon.Edit id="icon-edit-with-label" size={32} color={Color.white} semanticLabel="编辑项目" />
+      </Row>
+    </Column>
+  </IconDemoCard>
+);
+
+// Image图片演示容器
+const ImageDemoContainer = () => (
+  <ImageDemoCard>
+    <Column crossAxisAlignment="start">
+      <Text text="Image图片演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+      
+      {/* 1. 网络图片 - 基础用法 */}
+      <SizedBox height={8} />
+      <Text text="1. 网络图片（基础）" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Image 
+        id="network-image"
+        src="https://picsum.photos/300/200"
+        width={300}
+        height={200}
+      />
+      
+      {/* 2. BoxFit适应方式 */}
+      <SizedBox height={12} />
+      <Text text="2. BoxFit适应方式" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-cover"
+            src="https://picsum.photos/100"
+            width={80}
+            height={80}
+            fit="cover"
+          />
+          <SizedBox height={4} />
+          <Text text="cover" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-contain"
+            src="https://picsum.photos/100"
+            width={80}
+            height={80}
+            fit="contain"
+          />
+          <SizedBox height={4} />
+          <Text text="contain" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-fill"
+            src="https://picsum.photos/100"
+            width={80}
+            height={80}
+            fit="fill"
+          />
+          <SizedBox height={4} />
+          <Text text="fill" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+      </Row>
+      
+      {/* 3. 颜色混合 */}
+      <SizedBox height={12} />
+      <Text text="3. 颜色混合模式" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Row mainAxisAlignment="spaceAround">
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-color-red"
+            src="https://picsum.photos/90"
+            width={70}
+            height={70}
+            color={Color.fromRGBO(255, 0, 0, 0.5)}
+            colorBlendMode="modulate"
+          />
+          <SizedBox height={4} />
+          <Text text="红色调" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-color-blue"
+            src="https://picsum.photos/90"
+            width={70}
+            height={70}
+            color={Color.fromRGBO(0, 0, 255, 0.5)}
+            colorBlendMode="modulate"
+          />
+          <SizedBox height={4} />
+          <Text text="蓝色调" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+        <Column crossAxisAlignment="center">
+          <Image 
+            id="image-color-green"
+            src="https://picsum.photos/90"
+            width={70}
+            height={70}
+            color={Color.fromRGBO(0, 255, 0, 0.5)}
+            colorBlendMode="modulate"
+          />
+          <SizedBox height={4} />
+          <Text text="绿色调" style={{ fontSize: 10, color: Color.white }} />
+        </Column>
+      </Row>
+      
+      {/* 4. 对齐方式 */}
+      <SizedBox height={12} />
+      <Text text="4. 对齐方式" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Image 
+        id="image-aligned"
+        src="https://picsum.photos/150/100"
+        width={300}
+        height={150}
+        fit="none"
+        alignment="centerRight"
+      />
+      
+      {/* 5. 语义标签 */}
+      <SizedBox height={12} />
+      <Text text="5. 无障碍语义标签" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Image 
+        id="image-with-label"
+        src="https://picsum.photos/120"
+        width={100}
+        height={100}
+        semanticLabel="随机风景图片"
+      />
+    </Column>
+  </ImageDemoCard>
+);
+
   return (
     <MainScrollView 
       id="main-scroll-view"
@@ -694,6 +904,8 @@ const PaddingDemoContainer = () => (
         <ExpandedDemoContainer />
         <CenterDemoContainer />
         <PaddingDemoContainer />
+        <IconDemoContainer />
+        <ImageDemoContainer />
         <CounterDemo />
       </Column>
     </MainScrollView>

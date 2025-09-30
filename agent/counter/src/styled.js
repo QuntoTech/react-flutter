@@ -459,3 +459,27 @@ export const CircularElevatedButton = styleSheet.ElevatedButton({
   },
   elevation: 6
 });
+
+// Icon演示卡片
+export const IconDemoCard = styleSheet.Container({
+  width: 350,
+  height: 540,  // 增加高度避免溢出
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(0, 188, 212, 1.0),  // 青色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});
+
+// Image Demo卡片
+export const ImageDemoCard = styleSheet.Container({
+  width: 350,
+  height: 900,  // 增加高度避免内容溢出（257像素溢出 + 600原高度 = 至少857，使用900留余量）
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(103, 58, 183, 1.0),  // 深紫色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});

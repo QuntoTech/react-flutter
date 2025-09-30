@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "prebuild": "node scripts/generate-icons.js",
     "build": "webpack --mode=production",
+    "generate:icons": "node scripts/generate-icons.js",
     "test": "jest"
   },
   "peerDependencies": {
