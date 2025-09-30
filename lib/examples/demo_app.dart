@@ -14,6 +14,7 @@ import '../components/widgets/container.dart';
 import '../components/widgets/single_child_scroll_view.dart';
 import '../components/widgets/stack.dart';
 import '../components/widgets/positioned.dart';
+import '../components/widgets/expanded.dart';
 
 /// 演示应用
 /// 展示新架构的React+Flutter渲染功能
@@ -42,17 +43,18 @@ class _DemoAppState extends State<DemoApp> {
       });
 
       // 注册所有Flutter组件
-      ComponentRegistry.instance.registerAll([
-        TextComponent(),
-        ColumnComponent(),
-        RowComponent(),
-        ElevatedButtonComponent(),
-        SizedBoxComponent(),
-        ContainerComponent(),
-        SingleChildScrollViewComponent(),
-        StackComponent(),
-        PositionedComponent(),
-      ]);
+    ComponentRegistry.instance.registerAll([
+      TextComponent(),
+      ColumnComponent(),
+      RowComponent(),
+      ElevatedButtonComponent(),
+      SizedBoxComponent(),
+      ContainerComponent(),
+      SingleChildScrollViewComponent(),
+      StackComponent(),
+      PositionedComponent(),
+      ExpandedComponent(),
+    ]);
 
       setState(() {
         _status = '初始化React引擎...';

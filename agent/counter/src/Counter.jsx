@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -28,6 +28,7 @@ import {
   EllipsisText,
   SizedBoxDemoCard,
   StackDemoCard,
+  ExpandedDemoCard,
   FixedSizeBox,
   SpacerBox
 } from './styled';
@@ -381,6 +382,105 @@ const Counter = () => {
     </StackDemoCard>
   );
 
+  // Expanded组件演示
+  const ExpandedDemoContainer = () => (
+    <ExpandedDemoCard>
+      <Column crossAxisAlignment="start">
+        <Text text="Expanded弹性布局演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+        
+        {/* 1. 基础使用 - 平分空间 */}
+        <SizedBox height={8} />
+        <Text text="1. 平分空间 (1:1)" style={{ fontSize: 12, color: Color.white }} />
+        <SizedBox height={4} />
+        <Row id="expanded-equal-demo">
+          <Expanded id="expanded-equal-1">
+            <Container style={{
+              height: 50,
+              decoration: { color: Color.fromRGBO(244, 67, 54, 1.0) }
+            }}>
+              <Text text="1/2" style={{ fontSize: 14, color: Color.white }} textAlign="center" />
+            </Container>
+          </Expanded>
+          <Expanded id="expanded-equal-2">
+            <Container style={{
+              height: 50,
+              decoration: { color: Color.fromRGBO(33, 150, 243, 1.0) }
+            }}>
+              <Text text="1/2" style={{ fontSize: 14, color: Color.white }} textAlign="center" />
+            </Container>
+          </Expanded>
+        </Row>
+        
+        {/* 2. flex比例 - 2:1分配 */}
+        <SizedBox height={12} />
+        <Text text="2. flex比例 (2:1)" style={{ fontSize: 12, color: Color.white }} />
+        <SizedBox height={4} />
+        <Row id="expanded-flex-demo">
+          <Expanded flex={2} id="expanded-flex-2">
+            <Container style={{
+              height: 50,
+              decoration: { color: Color.fromRGBO(76, 175, 80, 1.0) }
+            }}>
+              <Text text="2/3 (flex: 2)" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+            </Container>
+          </Expanded>
+          <Expanded flex={1} id="expanded-flex-1">
+            <Container style={{
+              height: 50,
+              decoration: { color: Color.fromRGBO(255, 152, 0, 1.0) }
+            }}>
+              <Text text="1/3 (flex: 1)" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+            </Container>
+          </Expanded>
+        </Row>
+        
+        {/* 3. 与固定尺寸混合 */}
+        <SizedBox height={12} />
+        <Text text="3. 固定尺寸 + Expanded" style={{ fontSize: 12, color: Color.white }} />
+        <SizedBox height={4} />
+        <Row id="expanded-mixed-demo">
+          <Container style={{
+            width: 100,
+            height: 50,
+            decoration: { color: Color.fromRGBO(156, 39, 176, 1.0) }
+          }}>
+            <Text text="100px" style={{ fontSize: 14, color: Color.white }} textAlign="center" />
+          </Container>
+          <Expanded id="expanded-remaining">
+            <Container style={{
+              height: 50,
+              decoration: { color: Color.fromRGBO(0, 188, 212, 1.0) }
+            }}>
+              <Text text="剩余空间" style={{ fontSize: 14, color: Color.white }} textAlign="center" />
+            </Container>
+          </Expanded>
+        </Row>
+        
+        {/* 4. Column中的Expanded */}
+        <SizedBox height={12} />
+        <Text text="4. Column中的Expanded" style={{ fontSize: 12, color: Color.white }} />
+        <SizedBox height={4} />
+        <Container style={{ height: 100 }}>
+          <Column id="expanded-column-demo">
+            <Expanded id="expanded-column-top">
+              <Container style={{
+                decoration: { color: Color.fromRGBO(255, 193, 7, 1.0) }
+              }}>
+                <Text text="上部 (Expanded)" style={{ fontSize: 12, color: Color.fromRGBO(0, 0, 0, 1.0) }} textAlign="center" />
+              </Container>
+            </Expanded>
+            <Container style={{
+              height: 30,
+              decoration: { color: Color.fromRGBO(96, 125, 139, 1.0) }
+            }}>
+              <Text text="固定30px" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+            </Container>
+          </Column>
+        </Container>
+      </Column>
+    </ExpandedDemoCard>
+  );
+
   return (
     <MainScrollView 
       id="main-scroll-view"
@@ -402,6 +502,7 @@ const Counter = () => {
         <TextDemoContainer />
         <SizedBoxDemoContainer />
         <StackDemoContainer />
+        <ExpandedDemoContainer />
         <CounterDemo />
       </Column>
     </MainScrollView>

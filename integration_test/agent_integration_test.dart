@@ -375,5 +375,86 @@ void main() {
       final expandStack = tester.widget<Stack>(expandFinder);
       expect(expandStack.fit, equals(StackFit.expand));
     });
+
+    /// Expanded组件功能测试
+    testWidgets('Expanded平分空间测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 查找第一个Expanded演示（1:1平分）
+      final finder1 = find.byKey(const Key('expanded-equal-1'));
+      final finder2 = find.byKey(const Key('expanded-equal-2'));
+      
+      expect(finder1, findsOneWidget);
+      expect(finder2, findsOneWidget);
+      
+      final expanded1 = tester.widget<Expanded>(finder1);
+      final expanded2 = tester.widget<Expanded>(finder2);
+      
+      // 验证flex值相等（平分空间）
+      expect(expanded1.flex, equals(1));
+      expect(expanded2.flex, equals(1));
+      
+      // 验证Key正确设置
+      expect(expanded1.key, isA<Key>());
+      expect((expanded1.key as Key).toString(), contains('expanded-equal-1'));
+      expect(expanded2.key, isA<Key>());
+      expect((expanded2.key as Key).toString(), contains('expanded-equal-2'));
+    });
+
+    testWidgets('Expanded flex比例测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 查找flex比例演示（2:1）
+      final finder1 = find.byKey(const Key('expanded-flex-2'));
+      final finder2 = find.byKey(const Key('expanded-flex-1'));
+      
+      expect(finder1, findsOneWidget);
+      expect(finder2, findsOneWidget);
+      
+      final expanded1 = tester.widget<Expanded>(finder1);
+      final expanded2 = tester.widget<Expanded>(finder2);
+      
+      // 验证flex比例为2:1
+      expect(expanded1.flex, equals(2));
+      expect(expanded2.flex, equals(1));
+    });
+
+    testWidgets('Expanded与固定尺寸混合测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 查找混合布局中的Expanded
+      final finder = find.byKey(const Key('expanded-remaining'));
+      expect(finder, findsOneWidget);
+      
+      final expanded = tester.widget<Expanded>(finder);
+      
+      // 验证Expanded属性
+      expect(expanded.flex, equals(1));
+      expect(expanded.key, isA<Key>());
+      
+      // 验证子组件存在
+      expect(expanded.child, isA<Container>());
+    });
+
+    testWidgets('Column中的Expanded测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 查找Column中的Expanded
+      final finder = find.byKey(const Key('expanded-column-top'));
+      expect(finder, findsOneWidget);
+      
+      final expanded = tester.widget<Expanded>(finder);
+      
+      // 验证Expanded在Column中的表现
+      expect(expanded.flex, equals(1));
+      expect(expanded.child, isA<Container>());
+      
+      // 验证父组件是Column
+      final columnFinder = find.ancestor(
+        of: finder,
+        matching: find.byType(Column),
+      );
+      expect(columnFinder, findsWidgets);
+    });
   });
 }

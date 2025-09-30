@@ -338,6 +338,17 @@ export const StackDemoCard = styleSheet.Container({
   }
 });
 
+export const ExpandedDemoCard = styleSheet.Container({
+  width: 350,
+  height: 450,  // 增加高度以容纳所有Expanded示例
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(63, 81, 181, 1.0),  // 靛蓝色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});
+
 // 固定尺寸演示框
 export const FixedSizeBox = styleSheet.Container({
   decoration: {
