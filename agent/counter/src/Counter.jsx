@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container, Expanded, Center, Padding, EdgeInsets } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -30,6 +30,7 @@ import {
   StackDemoCard,
   ExpandedDemoCard,
   CenterDemoCard,
+  PaddingDemoCard,
   FixedSizeBox,
   SpacerBox
 } from './styled';
@@ -570,6 +571,105 @@ const CenterDemoContainer = () => (
   </CenterDemoCard>
 );
 
+const PaddingDemoContainer = () => (
+  <PaddingDemoCard>
+    <Column crossAxisAlignment="start">
+      <Text text="Padding内边距演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+      
+      {/* 1. EdgeInsets.all - 四周相同内边距 */}
+      <SizedBox height={8} />
+      <Text text="1. EdgeInsets.all(16)" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Container style={{ 
+        width: 280,
+        decoration: { color: Color.fromRGBO(255, 255, 255, 0.2) }
+      }}>
+        <Padding padding={EdgeInsets.all(16)} id="padding-all">
+          <Container style={{
+            decoration: { color: Color.fromRGBO(244, 67, 54, 1.0) }
+          }}>
+            <Text text="四周16px内边距" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+          </Container>
+        </Padding>
+      </Container>
+      
+      {/* 2. EdgeInsets.symmetric - 对称内边距（水平） */}
+      <SizedBox height={8} />
+      <Text text="2. EdgeInsets.symmetric(horizontal: 24)" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Container style={{ 
+        width: 280,
+        decoration: { color: Color.fromRGBO(255, 255, 255, 0.2) }
+      }}>
+        <Padding padding={EdgeInsets.symmetric({ horizontal: 24 })} id="padding-horizontal">
+          <Container style={{
+            decoration: { color: Color.fromRGBO(33, 150, 243, 1.0) }
+          }}>
+            <Text text="左右24px内边距" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+          </Container>
+        </Padding>
+      </Container>
+      
+      {/* 3. EdgeInsets.symmetric - 对称内边距（垂直） */}
+      <SizedBox height={8} />
+      <Text text="3. EdgeInsets.symmetric(vertical: 12)" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Container style={{ 
+        width: 280,
+        decoration: { color: Color.fromRGBO(255, 255, 255, 0.2) }
+      }}>
+        <Padding padding={EdgeInsets.symmetric({ vertical: 12 })} id="padding-vertical">
+          <Container style={{
+            decoration: { color: Color.fromRGBO(76, 175, 80, 1.0) }
+          }}>
+            <Text text="上下12px内边距" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+          </Container>
+        </Padding>
+      </Container>
+      
+      {/* 4. EdgeInsets.only - 指定边内边距 */}
+      <SizedBox height={8} />
+      <Text text="4. EdgeInsets.only(left: 32, top: 8)" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Container style={{ 
+        width: 280,
+        decoration: { color: Color.fromRGBO(255, 255, 255, 0.2) }
+      }}>
+        <Padding padding={EdgeInsets.only({ left: 32, top: 8 })} id="padding-only">
+          <Container style={{
+            decoration: { color: Color.fromRGBO(255, 152, 0, 1.0) }
+          }}>
+            <Text text="左32px 上8px" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+          </Container>
+        </Padding>
+      </Container>
+      
+      {/* 5. 嵌套Padding - 多层内边距叠加 */}
+      <SizedBox height={8} />
+      <Text text="5. 嵌套Padding (外16 + 内8)" style={{ fontSize: 12, color: Color.white }} />
+      <SizedBox height={4} />
+      <Container style={{ 
+        width: 280,
+        decoration: { color: Color.fromRGBO(255, 255, 255, 0.2) }
+      }}>
+        <Padding padding={EdgeInsets.all(16)} id="padding-outer">
+          <Container style={{
+            decoration: { color: Color.fromRGBO(156, 39, 176, 0.6) }
+          }}>
+            <Padding padding={EdgeInsets.all(8)} id="padding-inner">
+              <Container style={{
+                decoration: { color: Color.fromRGBO(156, 39, 176, 1.0) }
+              }}>
+                <Text text="嵌套内边距" style={{ fontSize: 12, color: Color.white }} textAlign="center" />
+              </Container>
+            </Padding>
+          </Container>
+        </Padding>
+      </Container>
+    </Column>
+  </PaddingDemoCard>
+);
+
   return (
     <MainScrollView 
       id="main-scroll-view"
@@ -593,6 +693,7 @@ const CenterDemoContainer = () => (
         <StackDemoContainer />
         <ExpandedDemoContainer />
         <CenterDemoContainer />
+        <PaddingDemoContainer />
         <CounterDemo />
       </Column>
     </MainScrollView>

@@ -360,6 +360,17 @@ export const CenterDemoCard = styleSheet.Container({
   }
 });
 
+export const PaddingDemoCard = styleSheet.Container({
+  width: 320,
+  height: 450,
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(255, 87, 34, 1.0),  // 深橙色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});
+
 // 固定尺寸演示框
 export const FixedSizeBox = styleSheet.Container({
   decoration: {

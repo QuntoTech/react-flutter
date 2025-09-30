@@ -529,5 +529,122 @@ void main() {
       // 验证子组件存在
       expect(center.child, isA<Container>());
     });
+
+    /// Padding组件功能测试
+    testWidgets('Padding EdgeInsets.all测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('padding-all'));
+      expect(finder, findsOneWidget);
+      
+      final padding = tester.widget<Padding>(finder);
+      
+      // 验证EdgeInsets.all(16)
+      expect(padding.padding, isA<EdgeInsets>());
+      final edgeInsets = padding.padding as EdgeInsets;
+      expect(edgeInsets.left, equals(16.0));
+      expect(edgeInsets.top, equals(16.0));
+      expect(edgeInsets.right, equals(16.0));
+      expect(edgeInsets.bottom, equals(16.0));
+      
+      // 验证Key正确设置
+      expect(padding.key, isA<Key>());
+      expect((padding.key as Key).toString(), contains('padding-all'));
+      
+      // 验证子组件存在
+      expect(padding.child, isA<Container>());
+    });
+
+    testWidgets('Padding EdgeInsets.symmetric horizontal测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('padding-horizontal'));
+      expect(finder, findsOneWidget);
+      
+      final padding = tester.widget<Padding>(finder);
+      
+      // 验证EdgeInsets.symmetric(horizontal: 24)
+      expect(padding.padding, isA<EdgeInsets>());
+      final edgeInsets = padding.padding as EdgeInsets;
+      expect(edgeInsets.left, equals(24.0));
+      expect(edgeInsets.right, equals(24.0));
+      expect(edgeInsets.top, equals(0.0));
+      expect(edgeInsets.bottom, equals(0.0));
+      
+      // 验证子组件存在
+      expect(padding.child, isA<Container>());
+    });
+
+    testWidgets('Padding EdgeInsets.symmetric vertical测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('padding-vertical'));
+      expect(finder, findsOneWidget);
+      
+      final padding = tester.widget<Padding>(finder);
+      
+      // 验证EdgeInsets.symmetric(vertical: 12)
+      expect(padding.padding, isA<EdgeInsets>());
+      final edgeInsets = padding.padding as EdgeInsets;
+      expect(edgeInsets.top, equals(12.0));
+      expect(edgeInsets.bottom, equals(12.0));
+      expect(edgeInsets.left, equals(0.0));
+      expect(edgeInsets.right, equals(0.0));
+      
+      // 验证子组件存在
+      expect(padding.child, isA<Container>());
+    });
+
+    testWidgets('Padding EdgeInsets.only测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('padding-only'));
+      expect(finder, findsOneWidget);
+      
+      final padding = tester.widget<Padding>(finder);
+      
+      // 验证EdgeInsets.only(left: 32, top: 8)
+      expect(padding.padding, isA<EdgeInsets>());
+      final edgeInsets = padding.padding as EdgeInsets;
+      expect(edgeInsets.left, equals(32.0));
+      expect(edgeInsets.top, equals(8.0));
+      expect(edgeInsets.right, equals(0.0));
+      expect(edgeInsets.bottom, equals(0.0));
+      
+      // 验证子组件存在
+      expect(padding.child, isA<Container>());
+    });
+
+    testWidgets('Padding嵌套测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 验证外层Padding
+      final outerFinder = find.byKey(const Key('padding-outer'));
+      expect(outerFinder, findsOneWidget);
+      
+      final outerPadding = tester.widget<Padding>(outerFinder);
+      
+      // 验证外层padding为all(16)
+      expect(outerPadding.padding, isA<EdgeInsets>());
+      final outerEdgeInsets = outerPadding.padding as EdgeInsets;
+      expect(outerEdgeInsets.left, equals(16.0));
+      expect(outerEdgeInsets.top, equals(16.0));
+      expect(outerEdgeInsets.right, equals(16.0));
+      expect(outerEdgeInsets.bottom, equals(16.0));
+      
+      // 验证内层Padding
+      final innerFinder = find.byKey(const Key('padding-inner'));
+      expect(innerFinder, findsOneWidget);
+      
+      final innerPadding = tester.widget<Padding>(innerFinder);
+      
+      // 验证内层padding为all(8)
+      expect(innerPadding.padding, isA<EdgeInsets>());
+      final innerEdgeInsets = innerPadding.padding as EdgeInsets;
+      expect(innerEdgeInsets.left, equals(8.0));
+      expect(innerEdgeInsets.top, equals(8.0));
+      expect(innerEdgeInsets.right, equals(8.0));
+      expect(innerEdgeInsets.bottom, equals(8.0));
+    });
   });
 }
