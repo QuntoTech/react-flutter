@@ -349,6 +349,17 @@ export const ExpandedDemoCard = styleSheet.Container({
   }
 });
 
+export const CenterDemoCard = styleSheet.Container({
+  width: 320,
+  height: 460,
+  padding: EdgeInsets.all(16),
+  margin: EdgeInsets.all(10),
+  decoration: {
+    color: Color.fromRGBO(121, 85, 72, 1.0),  // 棕色
+    borderRadius: { topLeft: 12, topRight: 12, bottomRight: 12, bottomLeft: 12 }
+  }
+});
+
 // 固定尺寸演示框
 export const FixedSizeBox = styleSheet.Container({
   decoration: {

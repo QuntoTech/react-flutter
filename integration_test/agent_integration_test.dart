@@ -456,5 +456,78 @@ void main() {
       );
       expect(columnFinder, findsWidgets);
     });
+
+    /// Center组件功能测试
+    testWidgets('Center基础居中测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('center-basic'));
+      expect(finder, findsOneWidget);
+      
+      final center = tester.widget<Center>(finder);
+      
+      // 验证Center属性（无因子时为null）
+      expect(center.widthFactor, isNull);
+      expect(center.heightFactor, isNull);
+      
+      // 验证Key正确设置
+      expect(center.key, isA<Key>());
+      expect((center.key as Key).toString(), contains('center-basic'));
+      
+      // 验证子组件存在
+      expect(center.child, isA<Container>());
+    });
+
+    testWidgets('Center widthFactor测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('center-width-factor'));
+      expect(finder, findsOneWidget);
+      
+      final center = tester.widget<Center>(finder);
+      
+      // 验证widthFactor为2.0
+      expect(center.widthFactor, equals(2.0));
+      expect(center.heightFactor, isNull);
+      
+      // 验证子组件存在
+      expect(center.child, isA<Container>());
+    });
+
+    testWidgets('Center heightFactor测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('center-height-factor'));
+      expect(finder, findsOneWidget);
+      
+      final center = tester.widget<Center>(finder);
+      
+      // 验证heightFactor为2.0
+      expect(center.heightFactor, equals(2.0));
+      expect(center.widthFactor, isNull);
+      
+      // 验证子组件存在
+      expect(center.child, isA<Container>());
+    });
+
+    testWidgets('Center组合因子测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('center-both-factors'));
+      expect(finder, findsOneWidget);
+      
+      final center = tester.widget<Center>(finder);
+      
+      // 验证widthFactor和heightFactor都为1.5
+      expect(center.widthFactor, equals(1.5));
+      expect(center.heightFactor, equals(1.5));
+      
+      // 验证Key正确设置
+      expect(center.key, isA<Key>());
+      expect((center.key as Key).toString(), contains('center-both-factors'));
+      
+      // 验证子组件存在
+      expect(center.child, isA<Container>());
+    });
   });
 }

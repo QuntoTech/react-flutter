@@ -15,6 +15,7 @@ import '../components/widgets/single_child_scroll_view.dart';
 import '../components/widgets/stack.dart';
 import '../components/widgets/positioned.dart';
 import '../components/widgets/expanded.dart';
+import '../components/widgets/center.dart';
 
 /// 演示应用
 /// 展示新架构的React+Flutter渲染功能
@@ -54,6 +55,7 @@ class _DemoAppState extends State<DemoApp> {
       StackComponent(),
       PositionedComponent(),
       ExpandedComponent(),
+      CenterComponent(),
     ]);
 
       setState(() {

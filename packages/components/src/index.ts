@@ -1,3 +1,4 @@
+export * from './center';
 export * from './column';
 export * from './container';
 export * from './elevated-button';
