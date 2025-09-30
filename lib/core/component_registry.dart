@@ -36,7 +36,7 @@ class ComponentRegistry {
   Widget? buildComponent(VirtualDOM vdom) {
     final component = _components[vdom.type];
     if (component == null) {
-      // debugPrint('未找到组件类型: ${vdom.type}');
+      debugPrint('⚠️ 未找到组件: ${vdom.type}');
       return _buildUnknownComponent(vdom);
     }
     

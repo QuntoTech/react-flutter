@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column, Row, Text, SizedBox, Color } from '@react-flutter/components';
+import { Column, Row, Text, SizedBox, Color, Stack, Positioned, Container } from '@react-flutter/components';
 import { 
   BasicStyleCard, 
   LinearGradientCard, 
@@ -27,6 +27,7 @@ import {
   StyledText,
   EllipsisText,
   SizedBoxDemoCard,
+  StackDemoCard,
   FixedSizeBox,
   SpacerBox
 } from './styled';
@@ -235,6 +236,151 @@ const Counter = () => {
     </SizedBoxDemoCard>
   );
 
+  // Stack组件演示
+  const StackDemoContainer = () => (
+    <StackDemoCard>
+      <Column crossAxisAlignment="start">
+        <Text text="Stack组件演示" style={{ fontSize: 16, fontWeight: 'bold', color: Color.white }} />
+        
+        {/* 1. 多层Container层叠示例 */}
+        <Text text="多层叠层示例" style={{ fontSize: 12, color: Color.white }} />
+        <Stack id="layered-stack-demo" alignment="center">
+          <Container 
+            id="stack-bg-layer"
+            style={{
+              width: 200,
+              height: 100,
+              decoration: { color: Color.fromRGBO(100, 150, 200, 1.0) }
+            }}
+          />
+          <Container 
+            id="stack-mid-layer"
+            style={{
+              width: 140,
+              height: 70,
+              decoration: { color: Color.fromRGBO(255, 100, 100, 1.0) }
+            }}
+          />
+          <Container 
+            id="stack-top-layer"
+            style={{
+              width: 80,
+              height: 40,
+              decoration: { color: Color.fromRGBO(255, 220, 100, 1.0) }
+            }}
+          >
+            <Text text="三层" style={{ fontSize: 10, color: Color.fromRGBO(0, 0, 0, 1.0) }} textAlign="center" />
+          </Container>
+        </Stack>
+        
+        <SizedBox height={12} />
+        
+        {/* 2. Positioned绝对定位示例 */}
+        <Text text="Positioned定位" style={{ fontSize: 12, color: Color.white }} />
+        <Stack id="positioned-stack-demo">
+          <Container 
+            style={{
+              width: 200,
+              height: 100,
+              decoration: { color: Color.fromRGBO(80, 80, 80, 0.3) }
+            }}
+          />
+          <Positioned 
+            id="positioned-demo"
+            left={20} 
+            top={30}
+            width={80}
+            height={40}
+          >
+            <Container 
+              style={{
+                decoration: { color: Color.fromRGBO(100, 200, 100, 1.0) }
+              }}
+            >
+              <Text text="定位" style={{ fontSize: 10, color: Color.white }} textAlign="center" />
+            </Container>
+          </Positioned>
+        </Stack>
+        
+        <SizedBox height={12} />
+        
+        {/* 3. 不同alignment示例 */}
+        <Text text="Alignment对齐" style={{ fontSize: 12, color: Color.white }} />
+        <Row mainAxisAlignment="spaceAround">
+          <Stack id="topleft-stack" alignment="topLeft">
+            <Container 
+              style={{
+                width: 80,
+                height: 60,
+                decoration: { color: Color.fromRGBO(150, 100, 200, 0.3) }
+              }}
+            />
+            <Container 
+              style={{
+                width: 40,
+                height: 30,
+                decoration: { color: Color.fromRGBO(200, 100, 150, 1.0) }
+              }}
+            >
+              <Text text="左上" style={{ fontSize: 8, color: Color.white }} textAlign="center" />
+            </Container>
+          </Stack>
+          
+          <Stack id="center-stack" alignment="center">
+            <Container 
+              style={{
+                width: 80,
+                height: 60,
+                decoration: { color: Color.fromRGBO(150, 100, 200, 0.3) }
+              }}
+            />
+            <Container 
+              style={{
+                width: 40,
+                height: 30,
+                decoration: { color: Color.fromRGBO(200, 100, 150, 1.0) }
+              }}
+            >
+              <Text text="居中" style={{ fontSize: 8, color: Color.white }} textAlign="center" />
+            </Container>
+          </Stack>
+        </Row>
+        
+        <SizedBox height={12} />
+        
+        {/* 4. 不同fit示例 */}
+        <Text text="Fit适配模式" style={{ fontSize: 12, color: Color.white }} />
+        <Row mainAxisAlignment="spaceAround">
+          <Container style={{ width: 90, height: 70 }}>
+            <Stack id="loose-stack" fit="loose">
+              <Container 
+                style={{
+                  width: 60,
+                  height: 50,
+                  decoration: { color: Color.fromRGBO(100, 200, 200, 1.0) }
+                }}
+              >
+                <Text text="loose" style={{ fontSize: 8, color: Color.white }} textAlign="center" />
+              </Container>
+            </Stack>
+          </Container>
+          
+          <Container style={{ width: 90, height: 70 }}>
+            <Stack id="expand-stack" fit="expand">
+              <Container 
+                style={{
+                  decoration: { color: Color.fromRGBO(200, 150, 100, 1.0) }
+                }}
+              >
+                <Text text="expand" style={{ fontSize: 8, color: Color.white }} textAlign="center" />
+              </Container>
+            </Stack>
+          </Container>
+        </Row>
+      </Column>
+    </StackDemoCard>
+  );
+
   return (
     <MainScrollView 
       id="main-scroll-view"
@@ -255,6 +401,7 @@ const Counter = () => {
         <RowDemoContainer />
         <TextDemoContainer />
         <SizedBoxDemoContainer />
+        <StackDemoContainer />
         <CounterDemo />
       </Column>
     </MainScrollView>

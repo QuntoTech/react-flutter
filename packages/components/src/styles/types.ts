@@ -247,6 +247,8 @@ export type TextBaselineValue = 'alphabetic' | 'ideographic';
 
 export type ClipBehaviorValue = 'none' | 'hardEdge' | 'antiAlias' | 'antiAliasWithSaveLayer';
 
+export type StackFitValue = 'loose' | 'expand' | 'passthrough';
+
 export type ScrollDirectionValue = 'vertical' | 'horizontal';
 
 export type ScrollPhysicsValue = 'bouncing' | 'clamping' | 'never';

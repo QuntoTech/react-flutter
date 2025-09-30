@@ -12,6 +12,8 @@ import '../components/widgets/elevated_button.dart';
 import '../components/widgets/sized_box.dart';
 import '../components/widgets/container.dart';
 import '../components/widgets/single_child_scroll_view.dart';
+import '../components/widgets/stack.dart';
+import '../components/widgets/positioned.dart';
 
 /// 演示应用
 /// 展示新架构的React+Flutter渲染功能
@@ -48,6 +50,8 @@ class _DemoAppState extends State<DemoApp> {
         SizedBoxComponent(),
         ContainerComponent(),
         SingleChildScrollViewComponent(),
+        StackComponent(),
+        PositionedComponent(),
       ]);
 
       setState(() {

@@ -148,7 +148,9 @@ class TextParsers {
   /// 解析TextDecoration
   static TextDecoration? _parseTextDecoration(dynamic value) {
     if (value == null) return null;
-    switch (value.toString()) {
+    if (value is! String) return null;  // 只处理字符串
+    
+    switch (value) {
       case 'none': return TextDecoration.none;
       case 'underline': return TextDecoration.underline;
       case 'overline': return TextDecoration.overline;

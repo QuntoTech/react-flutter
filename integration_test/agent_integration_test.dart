@@ -58,13 +58,8 @@ void main() {
   
   group('Counter Agent集成测试', () {
     
-    /// 每个测试都重新启动应用确保状态正确
-    Future<void> ensureAppLaunched(WidgetTester tester) async {
-      await launchAppAndWaitReady(tester);
-    }
-    
     testWidgets('Agent初始化和加载测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       expect(find.byType(SingleChildScrollView), findsOneWidget);
       expect(find.byType(Container), findsAtLeastNWidgets(1));
@@ -77,7 +72,7 @@ void main() {
     });
 
     testWidgets('Container Constraints约束功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('constraints-demo'));
       expect(finder, findsOneWidget);
@@ -125,7 +120,7 @@ void main() {
     });
 
     testWidgets('Container Alignment对齐功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('alignment-demo'));
       expect(finder, findsOneWidget);
@@ -135,7 +130,7 @@ void main() {
     });
 
     testWidgets('Container ForegroundDecoration前景装饰功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('foreground-decoration-demo'));
       expect(finder, findsOneWidget);
@@ -148,7 +143,7 @@ void main() {
     });
 
     testWidgets('Container ClipBehavior裁剪行为功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('clip-behavior-demo'));
       expect(finder, findsOneWidget);
@@ -158,7 +153,7 @@ void main() {
     });
 
     testWidgets('Container TransformAlignment变换中心点功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('transform-alignment-demo'));
       expect(finder, findsOneWidget);
@@ -168,7 +163,7 @@ void main() {
     });
 
     testWidgets('Container Transform Matrix4变换功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('transform-demo'));
       expect(finder, findsOneWidget);
@@ -182,7 +177,7 @@ void main() {
     });
 
     testWidgets('SingleChildScrollView滚动视图功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('main-scroll-view'));
       expect(finder, findsOneWidget);
@@ -195,7 +190,7 @@ void main() {
     });
 
     testWidgets('Column布局组件功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('demo-column'));
       expect(finder, findsOneWidget);
@@ -209,7 +204,7 @@ void main() {
     });
 
     testWidgets('Row布局组件功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       final finder = find.byKey(const Key('demo-row'));
       expect(finder, findsOneWidget);
@@ -223,7 +218,7 @@ void main() {
     });
 
     testWidgets('Text文本组件功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       // 验证Text演示容器存在
       final textDemoContainer = find.byKey(const Key('text-demo'));
@@ -258,7 +253,7 @@ void main() {
     });
 
     testWidgets('SizedBox尺寸控制组件功能测试', (WidgetTester tester) async {
-      await ensureAppLaunched(tester);
+      await launchAppAndWaitReady(tester);
       
       // 验证SizedBox演示容器存在
       final sizedBoxDemoContainer = find.byKey(const Key('sizedbox-demo'));
@@ -301,6 +296,84 @@ void main() {
       final squareBoxSize = tester.getSize(find.byKey(const Key('square-size-box')));
       expect(squareBoxSize.width, equals(60.0));
       expect(squareBoxSize.height, equals(60.0));
+    });
+
+    /// Stack组件功能测试
+    testWidgets('Stack多层叠层示例测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('layered-stack-demo'));
+      expect(finder, findsOneWidget);
+      
+      final stack = tester.widget<Stack>(finder);
+      
+      // 验证Stack属性
+      expect(stack.alignment, equals(Alignment.center));
+      expect(stack.fit, equals(StackFit.loose));
+      expect(stack.clipBehavior, equals(Clip.none));
+      
+      // 验证子组件数量（3层Container）
+      expect(stack.children.length, equals(3));
+      
+      // 验证Stack的Key
+      expect(stack.key, isA<Key>());
+      expect((stack.key as Key).toString(), contains('layered-stack-demo'));
+      
+      // 验证三层Container都存在
+      expect(stack.children[0], isA<Container>());
+      expect(stack.children[1], isA<Container>());
+      expect(stack.children[2], isA<Container>());
+    });
+
+    testWidgets('Positioned绝对定位功能测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      final finder = find.byKey(const Key('positioned-demo'));
+      expect(finder, findsOneWidget);
+      
+      final positioned = tester.widget<Positioned>(finder);
+      
+      // 验证Positioned属性
+      expect(positioned.left, equals(20.0));
+      expect(positioned.top, equals(30.0));
+      expect(positioned.width, equals(80.0));
+      expect(positioned.height, equals(40.0));
+      
+      // 验证Positioned的Key
+      expect(positioned.key, isA<Key>());
+      expect((positioned.key as Key).toString(), contains('positioned-demo'));
+    });
+
+    testWidgets('Stack alignment属性功能测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 测试topLeft对齐
+      final topLeftFinder = find.byKey(const Key('topleft-stack'));
+      expect(topLeftFinder, findsOneWidget);
+      final topLeftStack = tester.widget<Stack>(topLeftFinder);
+      expect(topLeftStack.alignment, equals(Alignment.topLeft));
+      
+      // 测试center对齐
+      final centerFinder = find.byKey(const Key('center-stack'));
+      expect(centerFinder, findsOneWidget);
+      final centerStack = tester.widget<Stack>(centerFinder);
+      expect(centerStack.alignment, equals(Alignment.center));
+    });
+
+    testWidgets('Stack fit属性功能测试', (WidgetTester tester) async {
+      await launchAppAndWaitReady(tester);
+      
+      // 测试loose fit
+      final looseFinder = find.byKey(const Key('loose-stack'));
+      expect(looseFinder, findsOneWidget);
+      final looseStack = tester.widget<Stack>(looseFinder);
+      expect(looseStack.fit, equals(StackFit.loose));
+      
+      // 测试expand fit
+      final expandFinder = find.byKey(const Key('expand-stack'));
+      expect(expandFinder, findsOneWidget);
+      final expandStack = tester.widget<Stack>(expandFinder);
+      expect(expandStack.fit, equals(StackFit.expand));
     });
   });
 }

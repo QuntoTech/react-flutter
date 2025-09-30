@@ -1,7 +1,9 @@
 export * from './column';
 export * from './container';
 export * from './elevated-button';
+export * from './positioned';
 export * from './single-child-scroll-view';
+export * from './stack';
 
 // StyleSheet system exports
 export { default as styleSheet } from './styles/stylesheet';
